@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-buildkite-agent metadata set 'teamci.title' 'Dummy Report'
+buildkite-agent meta-data set 'teamci.title' 'Dummy Report'
 
 echo 'Hello World'
