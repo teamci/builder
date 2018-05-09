@@ -1,3 +1,3 @@
 steps:
-  - label: Dummy
-    command: echo 'hello world'
+  - label: dummy
+    command: script/dummy
