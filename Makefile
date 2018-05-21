@@ -10,10 +10,18 @@ $(ENV): docker-compose.yml $(LINT_IMAGE_FILES) test/fake_api/*
 
 .PHONY: test-lint
 test-lint:
+	@echo '~~~ Linting Tests'
 	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 $(wildcard script/*) $(wildcard .buildkite/hooks/*)
+
+.PHONY: test-hooks
+test-hooks:
+	@echo '~~~ Testing hooks'
+	sh -c '. .buildkite/hooks/pre-command' > /dev/null
+	sh -c '. .buildkite/hooks/post-command' > /dev/null
 
 .PHONY: test-acceptance
 test-acceptance: $(ENV) | tmp/buildkite-agent
+	@echo '~~~ Acceptance Tests'
 	@env \
 		BUILDKITE_AGENT_METADIR=$(CURDIR)/tmp/buildkite-agent \
 		FIXTURE_DIR=$(CURDIR)/test/fixtures \
