@@ -37,7 +37,7 @@ code_dir="${PWD}/tmp/${repo}"
 rm -rf "${code_dir}"
 mkdir -p "${code_dir}"
 
-pushd "${code_dir}" > null
+pushd "${code_dir}" > /dev/null
 
 git remote set-url origin "https://x-access-token:${token}@github.com/${repo}.git"
 git clean -fdxq
