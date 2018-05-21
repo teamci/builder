@@ -27,6 +27,7 @@ test-acceptance: $(ENV) | tmp/buildkite-agent
 		FIXTURE_DIR=$(CURDIR)/test/fixtures \
 		PATH=$(CURDIR)/test/stubs/bin:$$PATH \
 		TEAMCI_API_URL=http://localhost:9292 \
+		TEAMCI_CODE_DIR=$(CURRDIR)/tmp/code \
 		bats test/acceptance/*_test.bats
 
 .PHONY: test-ci

@@ -2,6 +2,27 @@
 
 set -euo pipefail
 
+clone_command() {
+	if ! echo "${2}" | grep -Eq 'https:\/\/x-access-token:\w+@github\.com\/\w+\/\w+\.git'; then
+		echo "Bad upstream: ${2}" 1>&2
+		return 1
+	fi
+
+	local repo="$(echo "${2}" | cut -d '/' -f 5 | cut -d '.' -f 1)"
+
+	if [ -z "${repo}" ]; then
+		echo "Bad repo: ${2}" 1>&2
+		return 1
+	elif [ ! -d "${FIXTURE_DIR}/${repo}" ]; then
+		echo "No git fixture for ${repo}" 1>&2
+		return 1
+	else
+		mkdir -p "${3}"
+		echo "${repo}" > "${3}/.git-repo"
+		return 0
+	fi
+}
+
 remote_command() {
 	if [ $# -ne 3 ]; then
 		echo "Cannot stub git remote: $@" 1>&2
@@ -59,7 +80,10 @@ checkout_command() {
 			echo "No git fixture ${fixture}" 1>&2
 			return 1
 		else
+			rm -v *
 			cp -r "${fixture}/"* .
+			echo "${repo}" > .git-repo
+			echo "${branch}" > .git-branch
 		fi
 	fi
 }
@@ -95,6 +119,11 @@ main() {
 			shift
 
 			clean_command "$@"
+			;;
+		clone)
+			shift
+
+			clone_command "$@"
 			;;
 		fetch)
 			shift

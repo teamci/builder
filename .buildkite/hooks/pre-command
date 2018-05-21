@@ -5,3 +5,7 @@ set -euo pipefail
 echo '~~~ Building :docker:'
 
 docker-compose build lint
+
+echo '~~~ Preparing TeamCI environment :house_with_garden:'
+
+export TEAMCI_CODE_DIR="${HOME}/teamci/check_runs"

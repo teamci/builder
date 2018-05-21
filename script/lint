@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xeuo pipefail
+set -euo pipefail
 
 declare scratch access_token_url token
 declare repo head_sha head_branch
@@ -33,19 +33,25 @@ if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
 	exit 7
 fi
 
-code_dir="${PWD}/tmp/${repo}"
-rm -rf "${code_dir}"
-mkdir -p "${code_dir}"
+code_dir="${TEAMCI_CODE_DIR}/${repo}"
 
-pushd "${code_dir}" > /dev/null
+if [ -d "${code_dir}/.git" ]; then
+	pushd "${code_dir}" > /dev/null
 
-git remote set-url origin "https://x-access-token:${token}@github.com/${repo}.git"
-git clean -fdxq
+	git remote set-url origin "https://x-access-token:${token}@github.com/${repo}.git"
+else
+	mkdir -p "${code_dir}"
+
+	git clone -v "https://x-access-token:${token}@github.com/${repo}.git" "${code_dir}"
+
+	pushd "${code_dir}" > /dev/null
+fi
+
 git fetch -v --prune origin "${head_branch}"
 git checkout -f "${head_sha}"
-git clean -fdxq
+git ls-files > "${scratch}"
 
-git ls-files
+popd
 
 echo '~~~ Running Lint Test'
-git ls-files | exec docker-compose run --rm -v "${code_dir}:/code" -w "/code" lint
+docker-compose run --rm -v "${code_dir}:/code" -w "/code" lint < "${scratch}"
