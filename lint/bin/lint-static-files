@@ -32,6 +32,8 @@ end
 $stdout.puts report
 
 if report.neutral?
+	$stdout.puts
+
 	exit 7
 elsif report.passed?
 	exit 0
