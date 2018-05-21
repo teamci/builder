@@ -1,8 +1,8 @@
 version: '2'
 
 services:
-  teamci:
-    build: .
+  lint:
+    build: lint
 
   api:
     build: test/fake_api

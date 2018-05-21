@@ -1,6 +1,8 @@
 ENV:=tmp/env
 
-$(ENV): docker-compose.yml Dockerfile test/fake_api/*
+LINT_IMAGE_FILES:=$(shell find lint -print)
+
+$(ENV): docker-compose.yml $(LINT_IMAGE_FILES) test/fake_api/*
 	docker-compose build
 	docker-compose up -d api
 	@mkdir -p $(@D)

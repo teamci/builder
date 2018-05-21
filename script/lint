@@ -40,4 +40,4 @@ git fetch -v --prune origin "${head_branch}"
 git checkout -f "${head_sha}"
 git clean -fdxq
 
-git ls-files | exec docker-compose run --rm -v "${code_dir}:/code" -w "/code" teamci lint-static-files
+git ls-files | exec docker-compose run --rm -v "${code_dir}:/code" -w "/code" lint
