@@ -32,9 +32,7 @@ end
 $stdout.puts report
 
 if report.neutral?
-	$stdout.puts
-
-	exit 7
+	exit 1
 elsif report.passed?
 	exit 0
 else
