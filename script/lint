@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+declare scratch access_token_url token
+declare repo head_sha head_branch
+
+scratch="$(mktemp)"
+access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
+
+curl -H 'Accept: application/json' "${access_token_url}" > "${scratch}"
+
+token="$(jq -re '.token' "${scratch}")"
+
+if [ -z "${token}" ]; then
+	echo "Could not get access token" 1>&2
+	return 7
+fi
+
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'General purpose linting'
+
+repo="$(buildkite-agent meta-data get teamci.repo.slug)"
+head_sha="$(buildkite-agent meta-data get teamci.head_sha)"
+head_branch="$(buildkite-agent meta-data get teamci.head_branch)"
+
+if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
+	echo "Missing repo/sha/branch metadata" 1>&2
+	exit 7
+fi
+
+code_dir="${PWD}/tmp/${repo}"
+mkdir -p "${code_dir}"
+
+pushd "${code_dir}" > null
+
+git remote set-url origin "https://x-access-token:${token}@github.com/${repo}.git"
+git clean -fdxq
+git fetch -v --prune origin "${head_branch}"
+git checkout -f "${head_sha}"
+git clean -fdxq
+
+git ls-files | exec docker-compose run --rm -v "${code_dir}:/code" -w "/code" teamci lint-static-files

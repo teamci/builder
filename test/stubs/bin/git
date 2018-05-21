@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+remote_command() {
+	if [ $# -ne 3 ]; then
+		echo "Cannot stub git remote: $@" 1>&2
+		return 1
+	elif [ "${1:-}" = 'set-url' ] && [ "${2:-}" = 'origin' ]; then
+		if ! echo "${3}" | grep -Eq 'https:\/\/x-access-token:\w+@github\.com\/\w+\/\w+\.git'; then
+			echo "Bad upstream: ${3}" 1>&2
+			return 1
+		fi
+
+		local repo="$(echo "${3}" | cut -d '/' -f 5 | cut -d '.' -f 1)"
+
+		if [ -z "${repo}" ]; then
+			echo "Bad repo: ${3}" 1>&2
+			return 1
+		elif [ ! -d "${GIT_FIXTURE_DIR}/${repo}" ]; then
+			echo "No git fixture for ${repo}" 1>&2
+			return 1
+		else
+			echo "${repo}" > .git-repo
+			return 0
+		fi
+	else
+		echo "Cannot stub git remote: $@" 1>&2
+		return 1
+	fi
+}
+
+fetch_command() {
+	shift 2
+	if [ $# -ne 2 ]; then
+		echo "Cannot stub fetch: $@" 1>&2
+		return 1
+	else
+		echo "${2}" > .git-branch
+		return 0
+	fi
+}
+
+checkout_command() {
+	local OPTIND
+
+	if [ "${1}" != '-f' ]; then
+		echo "Unexpected git checkout option: ${1}" 1>&2
+		return 1
+	else
+		local repo="$(cat .git-repo)"
+		local branch="$(cat .git-branch)"
+		local fixture="${GIT_FIXTURE_DIR}/${repo}/${branch}"
+
+		if [ -z "${repo:-}" ] || [ -z "${branch:-}" ]; then
+			echo "No repo/branch stub configured" 1>&2
+			return 1
+		elif [ ! -d "${fixture}" ]; then
+			echo "No git fixture ${fixture}" 1>&2
+			return 1
+		else
+			cp -r "${fixture}/"* .
+		fi
+	fi
+}
+
+clean_command() {
+	local OPTIND
+
+	if [ "${1}" != '-fdxq' ]; then
+		echo "Unexpected git clean option: ${1}" 1>&2
+		return 1
+	else
+		return 0
+	fi
+}
+
+ls_files_command() {
+	if [ ! -f .git-repo ]; then
+		echo "No git repo found" 1>&2
+		return 1
+	else
+		find . -print
+	fi
+}
+
+main() {
+	case "${1:-}" in
+		checkout)
+			shift
+
+			checkout_command "$@"
+			;;
+		clean)
+			shift
+
+			clean_command "$@"
+			;;
+		fetch)
+			shift
+
+			fetch_command "$@"
+			;;
+		ls-files)
+			shift
+
+			ls_files_command "$@"
+
+			;;
+		remote)
+			shift
+
+			remote_command "$@"
+			;;
+		*)
+			echo "Cannot stub git command: $@" 1>&2
+			return 1
+	esac
+}
+
+main "$@"

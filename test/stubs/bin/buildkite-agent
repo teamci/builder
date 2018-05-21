@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+metadata_command() {
+	case "${1:-}" in
+		set)
+			local key="${2}" value="${3}"
+			echo "${value}" > "${BUILDKITE_AGENT_METADIR}/${key}"
+			;;
+		get)
+			local key="${2}"
+
+			cat "${BUILDKITE_AGENT_METADIR}/${key}"
+
+			;;
+		*)
+			echo "Cannot handle $@" 1>&2
+			return 1
+	esac
+}
+
+main() {
+	case "${1:-}" in
+		meta-data)
+			shift
+			metadata_command "$@"
+			;;
+		*)
+			echo "Cannot handle $@" 1>&2
+			return 1
+	esac
+}
+
+main "$@"

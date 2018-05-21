@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Dummy Report'
-
-echo 'Hello World'

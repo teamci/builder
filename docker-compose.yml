@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  teamci:
+    build: .
+
+  api:
+    build: test/fake_api
+    ports:
+      - "9292:9292"
