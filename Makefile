@@ -14,7 +14,7 @@ test-lint:
 test-acceptance: $(ENV) | tmp/buildkite-agent
 	@env \
 		BUILDKITE_AGENT_METADIR=$(CURDIR)/tmp/buildkite-agent \
-		GIT_FIXTURE_DIR=$(CURDIR)/test/fixtures \
+		FIXTURE_DIR=$(CURDIR)/test/fixtures \
 		PATH=$(CURDIR)/test/stubs/bin:$$PATH \
 		TEAMCI_API_URL=http://localhost:9292 \
 		bats test/acceptance/*_test.bats

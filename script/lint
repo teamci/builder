@@ -29,6 +29,7 @@ if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
 fi
 
 code_dir="${PWD}/tmp/${repo}"
+rm -rf "${code_dir}"
 mkdir -p "${code_dir}"
 
 pushd "${code_dir}" > null

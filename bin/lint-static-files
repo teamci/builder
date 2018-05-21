@@ -1,5 +1,37 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ruby
 
-set -euo pipefail
+$:.unshift(File.expand_path('../lib', __dir__))
 
-echo 'OK!'
+require 'bundler/setup'
+require 'oj'
+require 'yaml'
+require 'report'
+
+report = Report.new
+
+$stdin.each_line do |line|
+	file = line.chomp
+
+	case file
+	when /\.json$/
+		report.test("%s is valid JSON" % [ file ]) do
+			Oj.load(File.new(file))
+		end
+	when /\.ya?ml$/
+		report.test("%s is valid YAML" % [ file ]) do
+			YAML.load(File.read(file))
+		end
+	else
+		report.skip("lint %s" % [ file ])
+	end
+end
+
+$stdout.puts report
+
+if report.neutral?
+	exit 7
+elsif report.passed?
+	exit 0
+else
+	exit 1
+end

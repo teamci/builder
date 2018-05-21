@@ -17,7 +17,7 @@ remote_command() {
 		if [ -z "${repo}" ]; then
 			echo "Bad repo: ${3}" 1>&2
 			return 1
-		elif [ ! -d "${GIT_FIXTURE_DIR}/${repo}" ]; then
+		elif [ ! -d "${FIXTURE_DIR}/${repo}" ]; then
 			echo "No git fixture for ${repo}" 1>&2
 			return 1
 		else
@@ -50,7 +50,7 @@ checkout_command() {
 	else
 		local repo="$(cat .git-repo)"
 		local branch="$(cat .git-branch)"
-		local fixture="${GIT_FIXTURE_DIR}/${repo}/${branch}"
+		local fixture="${FIXTURE_DIR}/${repo}/${branch}"
 
 		if [ -z "${repo:-}" ] || [ -z "${branch:-}" ]; then
 			echo "No repo/branch stub configured" 1>&2
