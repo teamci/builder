@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+$stdout.sync = true
+$stderr.sync = true
+
 $:.unshift(File.expand_path('../lib', __dir__))
 
 require 'bundler/setup'
