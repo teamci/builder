@@ -1,3 +1,3 @@
 steps:
-  - label: dummy
-    command: script/dummy
+  - label: lint
+    command: script/lint
