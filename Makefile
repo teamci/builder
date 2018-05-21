@@ -8,7 +8,7 @@ $(ENV): docker-compose.yml Dockerfile test/fake_api/*
 
 .PHONY: test-lint
 test-lint:
-	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 $(wildcard script/*)
+	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 $(wildcard script/*) $(wildcard .buildkite/hooks/*)
 
 .PHONY: test-acceptance
 test-acceptance: $(ENV) | tmp/buildkite-agent

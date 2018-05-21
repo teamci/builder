@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+echo '~~~ Building :docker:'
+
+docker-compose build teamci
+
+echo '~~~ Running script'
