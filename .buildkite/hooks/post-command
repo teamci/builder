@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
-
-echo '~~~ Finished script'
+# This is a no-op script that triggers the post-command buildkite marker.
+# TeamCI uses that to snip the end of job output.
