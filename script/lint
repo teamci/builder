@@ -58,7 +58,7 @@ else
 	git ls-files > "${scratch}"
 fi
 
-popd
+popd > /dev/null
 
 echo '~~~ Running Lint Test'
 docker-compose run --rm -v "${code_dir}:/code" -w "/code" lint < "${scratch}"
