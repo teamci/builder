@@ -50,8 +50,6 @@ fi
 git fetch -v --prune origin "${head_branch}"
 git checkout -f "${head_sha}"
 
-ls -la
-
 if [ -x .teamci/lint/ls-files ]; then
 	echo '~~~ Using file list from: .teamci/lint/ls-files'
 	.teamci/lint/ls-files > "${scratch}"
