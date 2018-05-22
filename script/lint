@@ -49,7 +49,16 @@ fi
 
 git fetch -v --prune origin "${head_branch}"
 git checkout -f "${head_sha}"
-git ls-files > "${scratch}"
+
+ls -la
+
+if [ -x .teamci/lint/ls-files ]; then
+	echo '~~~ Using file list from: .teamci/lint/ls-files'
+	.teamci/lint/ls-files > "${scratch}"
+else
+	echo '~~~ Using files list from: git ls-files'
+	git ls-files > "${scratch}"
+fi
 
 popd
 

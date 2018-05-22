@@ -80,8 +80,7 @@ checkout_command() {
 			echo "No git fixture ${fixture}" 1>&2
 			return 1
 		else
-			rm -v *
-			cp -r "${fixture}/"* .
+			rsync -avh --delete "${fixture}/" .
 			echo "${repo}" > .git-repo
 			echo "${branch}" > .git-branch
 		fi
