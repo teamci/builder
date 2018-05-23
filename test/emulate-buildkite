@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export BUILDKITE_LABEL="$(basename "${1}")"
+
+source .buildkite/hooks/pre-command
+
+declare exit_code
+set +x
+"${1}"
+exit_code=$?
+set -x
+
+source .buildkite/hooks/post-command
+exit "${exit_code}"

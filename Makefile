@@ -17,13 +17,6 @@ test-lint:
 	@echo '~~~ Linting Tests'
 	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 $(wildcard script/*) $(wildcard .buildkite/hooks/*)
 
-.PHONY: test-hooks
-test-hooks:
-	@echo '~~~ Testing hooks'
-	env BUILDKITE_LABEL=:pipeline: sh -c '. .buildkite/hooks/pre-command' > /dev/null
-	env BUILDKITE_LABEL=:dummy: sh -c '. .buildkite/hooks/pre-command' > /dev/null
-	sh -c '. .buildkite/hooks/post-command' > /dev/null
-
 .PHONY: test-acceptance
 test-acceptance: $(ENV) | tmp/buildkite-agent
 	@echo '~~~ Acceptance Tests'
@@ -36,7 +29,7 @@ test-acceptance: $(ENV) | tmp/buildkite-agent
 		bats test/acceptance/*_test.bats
 
 .PHONY: test-ci
-test-ci: test-acceptance test-hooks test-pipeline test-lint
+test-ci: test-acceptance test-pipeline test-lint
 
 tmp/buildkite-agent:
 	mkdir -p $@

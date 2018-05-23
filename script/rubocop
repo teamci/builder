@@ -1,123 +1,33 @@
 #!/usr/bin/env bash
 
-set -xeuo pipefail
-
-declare scratch access_token_url token
-declare repo head_sha head_branch
-
-echo '~~~ Fetching Access Token'
-
-scratch="$(mktemp)"
-access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
-
-curl -H 'Accept: application/json' "${access_token_url}" > "${scratch}"
-
-token="$(jq -re '.token' "${scratch}")"
-
-if [ -z "${token}" ]; then
-	echo "Could not get access token" 1>&2
-	return 7
-fi
-
-echo '~~~ Setting Check Title'
+set -euo pipefail
 
 buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Syntax Check'
-
-echo '~~~ Cloning Target Code'
-
-repo="$(buildkite-agent meta-data get teamci.repo.slug)"
-head_sha="$(buildkite-agent meta-data get teamci.head_sha)"
-head_branch="$(buildkite-agent meta-data get teamci.head_branch)"
-
-if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
-	echo "FATAL: Missing repo/sha/branch metadata" 1>&2
-	exit 1
-fi
-
-code_dir="${TEAMCI_CODE_DIR}/${repo}"
-
-if [ -d "${code_dir}/.git" ]; then
-	pushd "${code_dir}" > /dev/null
-
-	git remote set-url origin "https://x-access-token:${token}@github.com/${repo}.git"
-else
-	mkdir -p "${code_dir}"
-
-	git clone -v "https://x-access-token:${token}@github.com/${repo}.git" "${code_dir}"
-
-	pushd "${code_dir}" > /dev/null
-fi
-
-git fetch -v --prune origin "${head_branch}"
-git checkout -f "${head_sha}"
-
-popd > /dev/null
-
-echo "INFO: ${head_branch} @ ${head_sha} ready"
-
-declare config_repo config_branch clone_status
-config_repo="$(buildkite-agent meta-data get teamci.config.repo)"
-config_branch="$(buildkite-agent meta-data get teamci.config.branch)"
-config_dir="${TEAMCI_CODE_DIR}/${config_repo}"
-
-echo "~~~ Syncing config repo"
-
-if [ -d "${config_dir}/.git" ]; then
-	pushd "${config_dir}" > /dev/null
-
-	git remote set-url origin "https://x-access-token:${token}@github.com/${config_repo}.git"
-	git fetch -v --prune origin "${config_branch}"
-	git checkout -f "${config_branch}"
-
-	popd > /dev/null
-
-	echo "INFO: synced shared configuration from ${config_repo}"
-else
-	mkdir -p "${code_dir}"
-
-	set +e
-	git clone -v "https://x-access-token:${token}@github.com/${config_repo}.git" "${config_dir}"
-	clone_status=$?
-	set -e
-
-	if [ $clone_status -ne 0 ]; then
-		echo "WARN: Could not clone ${config_dir}. Using default config."
-	else
-		pushd "${config_dir}" > /dev/null
-
-		git fetch -v --prune origin "${config_branch}"
-		git checkout -f "${config_branch}"
-
-		popd > /dev/null
-
-		echo "INFO: synced shared configuration from ${config_repo}"
-	fi
-fi
 
 echo '~~~ Preparing options'
 
 declare -a rubocop_args=(-f tap)
 declare -a docker_args=(--rm)
 
-if [ -f "${config_dir}/rubocop/config.yml" ]; then
-	echo "INFO: Using rubocop configuration file from ${config_repo}"
+if [ -f "${CONFIG_DIR}/rubocop/config.yml" ]; then
+	echo "INFO: Using rubocop configuration file in config repo"
 	rubocop_args+=(--config /config/rubocop/config.yml)
 else
-	echo "INFO: No rubocop configuration file in ${config_repo}. Using rubocop defaults"
+	echo "INFO: No rubocop configuration file in config repo. Using rubocop defaults"
 fi
 
-if [ -f "${config_dir}/rubocop/RUBOCOP_OPTS" ]; then
-	echo "INFO: Setting RUBOCOP_OPTS from file in ${config_repo}"
-	docker_args+=(-e "RUBOCOP_OPTS=$(cat "${config_dir}/rubocop/RUBOCOP_OPTS")")
+if [ -f "${CONFIG_DIR}/rubocop/RUBOCOP_OPTS" ]; then
+	echo "INFO: Setting RUBOCOP_OPTS from file in config repo"
+	docker_args+=(-e "RUBOCOP_OPTS=$(cat "${CONFIG_DIR}/rubocop/RUBOCOP_OPTS")")
 else
-	echo "INFO: No RUBOCOP_OPTS file in ${config_repo}. Using default options."
+	echo "INFO: No RUBOCOP_OPTS file in config repo. Using default options."
 fi
 
 echo '~~~ Running rubocop'
 
 docker-compose run \
 	"${docker_args[@]}" \
-	-v "${code_dir}:/code" \
-	-v "${config_dir}:/config" \
+	-v "${CODE_DIR}:/code" \
+	-v "${CONFIG_DIR}:/config" \
 	-w "/code" \
 	rubocop rubocop "${rubocop_args[@]}"

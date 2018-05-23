@@ -7,7 +7,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
 
-	run env BUILDKITE_LABEL=syntax script/syntax
+	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
@@ -20,7 +20,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'invalid_json'
 
-	run env BUILDKITE_LABEL=syntax script/syntax
+	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
@@ -33,7 +33,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'invalid_yml'
 
-	run env BUILDKITE_LABEL=syntax script/syntax
+	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
@@ -46,7 +46,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'skip'
 
-	run env BUILDKITE_LABEL=syntax script/syntax
+	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
@@ -59,7 +59,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'config_script'
 
-	run env BUILDKITE_LABEL=syntax script/syntax
+	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]

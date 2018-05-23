@@ -11,7 +11,9 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
+
+	echo "${output}"
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
@@ -23,11 +25,11 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 0 ]
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 0 ]
 }
@@ -36,7 +38,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
@@ -53,7 +55,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.config.repo' 'rubocop/config'
 	buildkite-agent meta-data set 'teamci.config.branch' 'with_config'
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
@@ -67,11 +69,11 @@ setup() {
 	buildkite-agent meta-data set 'teamci.config.repo' 'rubocop/config'
 	buildkite-agent meta-data set 'teamci.config.branch' 'with_config'
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 0 ]
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 0 ]
 }
@@ -82,7 +84,7 @@ setup() {
 	buildkite-agent meta-data set 'teamci.config.repo' 'rubocop/config'
 	buildkite-agent meta-data set 'teamci.config.branch' 'opts'
 
-	run env BUILDKITE_LABEL=rubocop script/rubocop
+	run test/emulate-buildkite script/rubocop
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]

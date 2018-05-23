@@ -2,12 +2,105 @@
 
 set -euo pipefail
 
-if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
+get_access_token() {
+	local scratch
+	scratch="$(mktemp)"
+
+	echo '~~~ Fetching Access Token'
+	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
+	curl -H 'Accept: application/json' "${access_token_url}" > "${scratch}"
+	export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
+}
+
+sync_code() {
+	echo '~~~ Cloning code'
+	local repo head_sha head_branch
+
+	repo="$(buildkite-agent meta-data get teamci.repo.slug)"
+	head_sha="$(buildkite-agent meta-data get teamci.head_sha)"
+	head_branch="$(buildkite-agent meta-data get teamci.head_branch)"
+
+	if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
+		echo "FATAL: Missing repo/sha/branch metadata" 1>&2
+		exit 1
+	fi
+
+	export CODE_DIR="${TEAMCI_CODE_DIR}/${repo}"
+
+	if [ -d "${CODE_DIR}/.git" ]; then
+		pushd "${CODE_DIR}" > /dev/null
+
+		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git"
+	else
+		mkdir -p "${CODE_DIR}"
+
+		git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}"
+
+		pushd "${CODE_DIR}" > /dev/null
+	fi
+
+	git fetch -v --prune origin "${head_branch}"
+	git checkout -f "${head_sha}"
+
+	popd > /dev/null
+
+	echo "INFO: code ${head_branch} @ ${head_sha} ready"
+}
+
+sync_config() {
+	echo "~~~ Syncing config repo"
+
+	local config_repo config_branch clone_status
+
+	config_repo="$(buildkite-agent meta-data get teamci.config.repo)"
+	config_branch="$(buildkite-agent meta-data get teamci.config.branch)"
+
+	export CONFIG_DIR="${TEAMCI_CODE_DIR}/${config_repo}"
+
+	if [ -d "${CONFIG_DIR}/.git" ]; then
+		pushd "${CONFIG_DIR}" > /dev/null
+
+		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${config_repo}.git"
+		git fetch -v --prune origin "${config_branch}"
+		git checkout -f "${config_branch}"
+
+		popd > /dev/null
+
+		echo "INFO: synced shared configuration from ${config_repo}"
+	else
+		mkdir -p "${CODE_DIR}"
+
+		set +e
+		git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${config_repo}.git" "${CONFIG_DIR}"
+		clone_status=$?
+		set -e
+
+		if [ $clone_status -ne 0 ]; then
+			echo "WARN: Could not clone ${config_repo}. Using default config."
+		else
+			pushd "${CONFIG_DIR}" > /dev/null
+
+			git fetch -v --prune origin "${config_branch}"
+			git checkout -f "${config_branch}"
+
+			popd > /dev/null
+
+			echo "INFO: synced shared configuration from ${config_repo}"
+		fi
+	fi
+}
+
+docker_build() {
 	echo '~~~ Building :docker:'
-
 	docker-compose build syntax rubocop
+}
 
-	echo '~~~ Preparing TeamCI environment :house_with_garden:'
+if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
+	get_access_token
+	sync_code
+	sync_config
 
-	export TEAMCI_CODE_DIR="${HOME}/teamci/check_runs"
+	if [ -n "${CI:-}" ]; then
+		docker_build
+	fi
 fi
