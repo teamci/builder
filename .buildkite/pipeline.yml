@@ -1,3 +1,6 @@
 steps:
   - label: syntax
     command: script/syntax
+
+  - label: rubocop
+    command: script/rubocop
