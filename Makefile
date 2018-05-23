@@ -20,7 +20,8 @@ test-lint:
 .PHONY: test-hooks
 test-hooks:
 	@echo '~~~ Testing hooks'
-	sh -c '. .buildkite/hooks/pre-command' > /dev/null
+	env BUILDKITE_LABEL=:pipeline: sh -c '. .buildkite/hooks/pre-command' > /dev/null
+	env BUILDKITE_LABEL=:dummy: sh -c '. .buildkite/hooks/pre-command' > /dev/null
 	sh -c '. .buildkite/hooks/post-command' > /dev/null
 
 .PHONY: test-acceptance
