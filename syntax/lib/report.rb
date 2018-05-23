@@ -30,6 +30,7 @@ class Report
 
   def to_s
     lines = [ ]
+    lines << "--- TAP"
     lines << "1..%d" % [ @results.length ]
 
     @results.each_with_index do |(outcome, name, message), i|
@@ -46,6 +47,8 @@ class Report
         fail "Unexpected outcome: #{outcome}"
       end
     end
+
+    lines << "--- TAP"
 
     lines.join("\n")
   end

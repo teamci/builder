@@ -8,6 +8,7 @@
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
+	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
@@ -22,6 +23,7 @@
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
+	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
@@ -36,6 +38,7 @@
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
+	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
@@ -50,6 +53,7 @@
 
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
+	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
