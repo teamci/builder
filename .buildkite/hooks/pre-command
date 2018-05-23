@@ -5,7 +5,7 @@ set -euo pipefail
 if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	echo '~~~ Building :docker:'
 
-	docker-compose build syntax
+	docker-compose build syntax rubocop
 
 	echo '~~~ Preparing TeamCI environment :house_with_garden:'
 

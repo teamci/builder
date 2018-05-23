@@ -8,7 +8,9 @@ clone_command() {
 		return 1
 	fi
 
-	local repo="$(echo "${2}" | cut -d '/' -f 5 | cut -d '.' -f 1)"
+	local org="$(echo "${3}" | cut -d '/' -f 4)"
+	local name="$(echo "${2}" | cut -d '/' -f 5 | cut -d '.' -f 1)"
+	local repo="${org}/${name}"
 
 	if [ -z "${repo}" ]; then
 		echo "Bad repo: ${2}" 1>&2

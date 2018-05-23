@@ -4,6 +4,9 @@ services:
   syntax:
     build: syntax
 
+  rubocop:
+    build: rubocop
+
   api:
     build: test/fake_api
     ports:

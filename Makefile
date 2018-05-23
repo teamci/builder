@@ -1,8 +1,8 @@
 ENV:=tmp/env
 
-SYNTAX_IMAGE_FILES:=$(shell find syntax -print)
+DOCKER_IMAGE_FILES:=$(shell find {syntax,rubocop} -print)
 
-$(ENV): docker-compose.yml $(SYNTAX_IMAGE_FILES) test/fake_api/*
+$(ENV): docker-compose.yml $(DOCKER_IMAGE_FILES) test/fake_api/*
 	docker-compose build
 	docker-compose up -d api
 	@mkdir -p $(@D)
