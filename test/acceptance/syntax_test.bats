@@ -6,8 +6,6 @@
 
 	run env BUILDKITE_LABEL=syntax script/syntax
 
-	echo "${output}"
-
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 
