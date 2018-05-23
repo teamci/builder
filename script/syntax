@@ -21,7 +21,7 @@ fi
 
 echo '~~~ Setting Check Title'
 
-buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'General purpose linting'
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Syntax Check'
 
 echo '~~~ Cloning Target Code'
 repo="$(buildkite-agent meta-data get teamci.repo.slug)"
@@ -50,9 +50,9 @@ fi
 git fetch -v --prune origin "${head_branch}"
 git checkout -f "${head_sha}"
 
-if [ -x .teamci/lint/ls-files ]; then
-	echo '~~~ Using file list from: .teamci/lint/ls-files'
-	.teamci/lint/ls-files > "${scratch}"
+if [ -x .teamci/syntax/ls-files ]; then
+	echo '~~~ Using file list from: .teamci/syntax/ls-files'
+	.teamci/syntax/ls-files > "${scratch}"
 else
 	echo '~~~ Using files list from: git ls-files'
 	git ls-files > "${scratch}"
@@ -60,5 +60,5 @@ fi
 
 popd > /dev/null
 
-echo '~~~ Running Lint Test'
-docker-compose run --rm -v "${code_dir}:/code" -w "/code" lint < "${scratch}"
+echo '~~~ Running Syntax Test'
+docker-compose run --rm -v "${code_dir}:/code" -w "/code" syntax < "${scratch}"

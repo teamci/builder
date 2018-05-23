@@ -1,8 +1,8 @@
 ENV:=tmp/env
 
-LINT_IMAGE_FILES:=$(shell find lint -print)
+SYNTAX_IMAGE_FILES:=$(shell find syntax -print)
 
-$(ENV): docker-compose.yml $(LINT_IMAGE_FILES) test/fake_api/*
+$(ENV): docker-compose.yml $(SYNTAX_IMAGE_FILES) test/fake_api/*
 	docker-compose build
 	docker-compose up -d api
 	@mkdir -p $(@D)

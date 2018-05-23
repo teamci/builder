@@ -25,7 +25,7 @@ $stdin.each_line do |line|
 			YAML.load(File.read(file))
 		end
 	else
-		report.skip("lint %s" % [ file ])
+		report.skip("check %s" % [ file ])
 	end
 end
 

@@ -1,8 +1,8 @@
 version: '2'
 
 services:
-  lint:
-    build: lint
+  syntax:
+    build: syntax
 
   api:
     build: test/fake_api
