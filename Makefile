@@ -8,6 +8,10 @@ $(ENV): docker-compose.yml $(SYNTAX_IMAGE_FILES) test/fake_api/*
 	@mkdir -p $(@D)
 	@touch $@
 
+.PHONY: test-pipeline
+test-pipeline:
+	docker run --rm -v $(CURDIR):/data -w /data ruby:2.5 ruby test/pipeline_test.rb
+
 .PHONY: test-lint
 test-lint:
 	@echo '~~~ Linting Tests'
@@ -31,7 +35,7 @@ test-acceptance: $(ENV) | tmp/buildkite-agent
 		bats test/acceptance/*_test.bats
 
 .PHONY: test-ci
-test-ci: test-acceptance test-lint
+test-ci: test-acceptance test-pipeline test-lint
 
 tmp/buildkite-agent:
 	mkdir -p $@
