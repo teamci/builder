@@ -11,7 +11,7 @@
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 
-	[ -z "$(buildkite-agent metadata get 'teamci.syntax.title')" ]
+	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "invalid json fails" {
@@ -25,7 +25,7 @@
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 
-	[ -z "$(buildkite-agent metadata get 'teamci.syntax.title')" ]
+	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "invalid yml fails" {
@@ -39,7 +39,7 @@
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 
-	[ -z "$(buildkite-agent metadata get 'teamci.syntax.title')" ]
+	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "no files to syntax" {
@@ -53,7 +53,7 @@
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
 
-	[ -z "$(buildkite-agent metadata get 'teamci.syntax.title')" ]
+	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "ls-files script present" {
@@ -64,10 +64,8 @@
 
 	run env BUILDKITE_LABEL=syntax script/syntax
 
-	echo "${output}"
-
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 
-	[ -z "$(buildkite-agent metadata get 'teamci.syntax.title')" ]
+	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
