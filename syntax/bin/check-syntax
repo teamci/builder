@@ -13,28 +13,28 @@ require 'report'
 report = Report.new
 
 $stdin.each_line do |line|
-	file = line.chomp
+  file = line.chomp
 
-	case file
-	when /\.json$/
-		report.test("%s is valid JSON" % [ file ]) do
-			Oj.load(File.new(file))
-		end
-	when /\.ya?ml$/
-		report.test("%s is valid YAML" % [ file ]) do
-			YAML.load(File.read(file))
-		end
-	else
-		report.skip("check %s" % [ file ])
-	end
+  case file
+  when /\.json$/
+    report.test("%s is valid JSON" % [ file ]) do
+      Oj.load(File.new(file))
+    end
+  when /\.ya?ml$/
+    report.test("%s is valid YAML" % [ file ]) do
+      YAML.load(File.read(file))
+    end
+  else
+    report.skip("check %s" % [ file ])
+  end
 end
 
 $stdout.puts report
 
 if report.neutral?
-	exit 7
+  exit 7
 elsif report.passed?
-	exit 0
+  exit 0
 else
-	exit 1
+  exit 1
 end
