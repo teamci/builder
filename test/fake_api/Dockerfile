@@ -1,5 +1,7 @@
 FROM ruby:2.5
 
+ENV PATH /usr/local/bundle/bin:$PATH
+
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
