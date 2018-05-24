@@ -36,7 +36,7 @@ class Report
 
     @results.each_with_index do |(outcome, name, message), i|
       if outcome == :ok
-        lines << format('%<result>s %<number>%d - %<name>%s', {
+        lines << format('%<result>s %<number>d - %<name>s', {
           result: 'ok',
           number: i + + 1,
           name: name
