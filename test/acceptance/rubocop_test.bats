@@ -5,6 +5,8 @@ setup() {
 	# Required metadata, but scripts continue if these cannot be cloned
 	buildkite-agent meta-data set 'teamci.config.repo' 'no-op/no-op'
 	buildkite-agent meta-data set 'teamci.config.branch' 'master'
+
+	rm -rf "${TEAMCI_CODE_DIR}/"*
 }
 
 @test "rubocop: valid repo passes" {
@@ -12,8 +14,6 @@ setup() {
 	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
 
 	run test/emulate-buildkite script/rubocop
-
-	echo "${output}"
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]

@@ -63,6 +63,7 @@ sync_config() {
 		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${config_repo}.git"
 		git fetch -v --prune origin "${config_branch}"
 		git checkout -f "${config_branch}"
+		git pull "${config_branch}"
 
 		popd > /dev/null
 

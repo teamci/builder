@@ -1,6 +1,8 @@
 setup() {
 	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
 	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
+
+	rm -rf "${TEAMCI_CODE_DIR}/"*
 }
 
 @test "syntax: valid repo passes" {
