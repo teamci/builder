@@ -126,7 +126,7 @@ ls_files_command() {
 		echo "No git repo found" 1>&2
 		return 1
 	else
-		find . -print | grep -vF '.git'
+		find . -type f -print | grep -vF '.git'
 	fi
 }
 

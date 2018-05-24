@@ -7,6 +7,9 @@ services:
   rubocop:
     build: rubocop
 
+  shellcheck:
+    image: koalaman/shellcheck:v0.4.7
+
   api:
     build: test/fake_api
     ports:

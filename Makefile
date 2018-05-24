@@ -18,6 +18,7 @@ test-lint:
 	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 $(wildcard script/*) $(wildcard .buildkite/hooks/*)
 
 .PHONY: test-acceptance
+test-acceptance: FILE=test/acceptance/*_bats
 test-acceptance: $(ENV) | tmp/buildkite-agent
 	@echo '~~~ Acceptance Tests'
 	@env \
@@ -26,7 +27,7 @@ test-acceptance: $(ENV) | tmp/buildkite-agent
 		PATH=$(CURDIR)/test/stubs/bin:$$PATH \
 		TEAMCI_API_URL=http://localhost:9292 \
 		TEAMCI_CODE_DIR=$(CURRDIR)/tmp/code \
-		bats test/acceptance/*_test.bats
+		bats $(FILE)
 
 .PHONY: test-ci
 test-ci: test-acceptance test-pipeline test-lint
