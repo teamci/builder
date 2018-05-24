@@ -62,7 +62,9 @@ else
 	popd > /dev/null
 fi
 
-total_files="$(wc -l "${scratch}" | tr -s ' ' | cut -d ' ' -f 2)"
+# NOTE: GNU/BSD ouput differents amounts of leading whitespace. Strip all
+# leading whitespace so cut works correctly
+total_files="$(wc -l "${scratch}" | sed -E 's/^\s*//g' | cut -d ' ' -f 1)"
 
 echo "INFO: found ${total_files} file(s)"
 
