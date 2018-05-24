@@ -8,8 +8,8 @@ echo '~~~ Software versions'
 
 echo '$ ruby --version'
 docker-compose run --rm rubocop ruby --version
-echo '$ rubocop --version'
-docker-compose run --rm rubocop rubocop --version
+# echo '$ rubocop --version'
+# docker-compose run --rm rubocop rubocop --version
 
 echo '~~~ Preparing options'
 
