@@ -99,6 +99,12 @@ pull_command() {
 	if [ ! -f .git/branch ] || [ ! -f .git/repo ]; then
 		echo "No git branch in ${PWD}" 1>&2
 		return 1
+	elif [ $# -ne 2 ]; then
+		echo "Cannot stub pull ${@}" 1>&2
+		return 1
+	elif [ "${1}" != 'origin' ]; then
+		echo "must pull from origin" 1>&2
+		return 1
 	else
 		return 0
 	fi
