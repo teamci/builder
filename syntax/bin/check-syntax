@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 $stdout.sync = true
 $stderr.sync = true
 
-$:.unshift(File.expand_path('../lib', __dir__))
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'bundler/setup'
 require 'oj'
@@ -17,15 +18,15 @@ $stdin.each_line do |line|
 
   case file
   when /\.json$/
-    report.test("%s is valid JSON" % [ file ]) do
+    report.test(format('%<file>s is valid JSON', file: file)) do
       Oj.load(File.new(file))
     end
   when /\.ya?ml$/
-    report.test("%s is valid YAML" % [ file ]) do
-      YAML.load(File.read(file))
+    report.test(format('%<file>s is valid YAML', file: file)) do
+      YAML.safe_load(File.read(file))
     end
   else
-    report.skip("check %s" % [ file ])
+    report.skip(format('check %<file>s', file: file))
   end
 end
 

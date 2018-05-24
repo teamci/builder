@@ -1,15 +1,15 @@
+# frozen_string_literal: true
+
 class Report
   def initialize
-    @results = [ ]
+    @results = []
   end
 
-  def test(name, &block)
-    begin
-      yield
-      @results << [ :ok, name, nil ]
-    rescue => ex
-      @results << [ :fail, name, ex.message ]
-    end
+  def test(name)
+    yield
+    @results << [ :ok, name, nil ]
+  rescue StandardError => ex
+    @results << [ :fail, name, ex.message ]
   end
 
   def skip(name)
@@ -17,7 +17,7 @@ class Report
   end
 
   def passed?
-    !@results.any? do |(outcome, _name, _message)|
+    @results.none? do |(outcome, _name, _message)|
       outcome == :fail
     end
   end
@@ -28,28 +28,42 @@ class Report
     end
   end
 
+  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def to_s
-    lines = [ ]
-    lines << "--- TAP"
-    lines << "1..%d" % [ @results.length ]
+    lines = []
+    lines << '--- TAP'
+    lines << format('1..%<total>d', total: @results.length)
 
     @results.each_with_index do |(outcome, name, message), i|
       if outcome == :ok
-        lines << "%s %d - %s" % [ 'ok', i + 1, name ]
+        lines << format('%<result>s %<number> - %<name>', {
+          result: 'ok',
+          number: i + + 1,
+          name: name
+        })
       elsif outcome == :skip
-        lines << "%s %d - # SKIP %s" % [ 'ok', i + 1, name ]
+        lines << format('%<result>s %<number>d - # SKIP %<name>s', {
+          result: 'ok',
+          number: i + + 1,
+          name: name
+        })
       elsif outcome == :fail
-        lines << "%s %d - %s" % [ 'not ok', i + 1, name ]
+        lines << format('%<result>s %<number> - %<name>', {
+          result: 'not ok',
+          number: i + + 1,
+          name: name
+        })
         message.lines.each do |line|
-          lines << "# %s" % [ line.chomp ]
+          lines << format('# %<text>s', text: line.chomp)
         end
       else
-        fail "Unexpected outcome: #{outcome}"
+        raise "Unexpected outcome: #{outcome}"
       end
     end
 
-    lines << "--- TAP"
+    lines << '--- TAP'
 
     lines.join("\n")
   end
+  # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 end
