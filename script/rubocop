@@ -4,6 +4,13 @@ set -euo pipefail
 
 buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Syntax Check'
 
+echo '~~~ Software versions'
+
+echo '$ ruby --version'
+docker-compose run --rm rubocop ruby --version
+echo '$ rubocop --version'
+docker-compose run --rm rubocop rubocop --version
+
 echo '~~~ Preparing options'
 
 declare -a rubocop_args=(-f tap)
