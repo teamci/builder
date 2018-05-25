@@ -64,7 +64,7 @@ fi
 
 # NOTE: GNU/BSD ouput differents amounts of leading whitespace. Strip all
 # leading whitespace so cut works correctly
-total_files="$(wc -l "${scratch}" | sed -E 's/^\s*//g' | cut -d ' ' -f 1)"
+total_files="$(wc -l "${scratch}" | sed -E 's/^[[:space:]]+//g' | cut -d ' ' -f 1)"
 
 echo "INFO: found ${total_files} file(s)"
 
