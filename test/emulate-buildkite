@@ -10,10 +10,10 @@ export "BUILDKITE_LABEL=${label}"
 source .buildkite/hooks/pre-command
 
 declare exit_code
-set +x
+set +e
 "${1}"
 exit_code=$?
-set -x
+set -e
 
 source .buildkite/hooks/post-command
 exit "${exit_code}"
