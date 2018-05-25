@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	local output exit_code
+	output="$(mktemp)"
+
+	set +e
+	rubocop "$@" --out "${output}"
+	exit_code=$?
+	set -e
+
+	tapify.rb < "${output}"
+
+	if [ "${exit_code}" -eq 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+main "$@"
