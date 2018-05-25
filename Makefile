@@ -22,7 +22,7 @@ test-lint:
 		test/emulate-buildkite
 
 .PHONY: test-acceptance
-test-acceptance: FILE=test/acceptance/*_bats
+test-acceptance: FILE=$(wildcard test/acceptance/*_test.bats)
 test-acceptance: $(ENV) | tmp/buildkite-agent
 	@echo '~~~ Acceptance Tests'
 	@env \
