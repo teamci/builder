@@ -13,7 +13,7 @@ docker-compose run --rm rubocop rubocop --version
 
 echo '~~~ Preparing options'
 
-declare -a rubocop_args=(-f tap)
+declare -a rubocop_args=(-f json --extra-details --display-style-guide)
 declare -a docker_args=(--rm)
 
 if [ -f "${CONFIG_DIR}/rubocop/config.yml" ]; then
@@ -37,4 +37,4 @@ docker-compose run \
 	-v "${CODE_DIR}:/code" \
 	-v "${CONFIG_DIR}:/config" \
 	-w "/code" \
-	rubocop rubocop "${rubocop_args[@]}"
+	rubocop rubocop-tap "${rubocop_args[@]}"

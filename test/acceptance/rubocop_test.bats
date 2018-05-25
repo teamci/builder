@@ -40,11 +40,21 @@ setup() {
 
 	run test/emulate-buildkite script/rubocop
 
+	echo "${output}"
+
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 
-	# Test that rubcop did run and the non-zero exit is from rubocop
-	echo "${output}" | grep -qF '1 offense'
+	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
+
+	# Test for annotation keys
+	echo "${output}" | grep -qF 'filename:'
+	echo "${output}" | grep -qF 'blob_href:'
+	echo "${output}" | grep -qF 'start_line:'
+	echo "${output}" | grep -qF 'end_line:'
+	echo "${output}" | grep -qF 'warning_level:'
+	echo "${output}" | grep -qF 'message:'
+	echo "${output}" | grep -qF 'title:'
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }

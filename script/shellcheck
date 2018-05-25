@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Shellcheck - static analysis tool for shell scripts'
+
+declare -a docker_opts=(--rm)
+declare scratch
+
+echo '~~~ Software versions'
+echo '$ shellcheck --version'
+docker-compose run --rm shellcheck shellcheck --version
+
+echo '~~~ Preparing options'
+
+if [ -f "${CONFIG_DIR}/shellcheck/SHELLCHECK_OPTS" ]; then
+	scratch="$(cat "${CONFIG_DIR}/shellcheck/SHELLCHECK_OPTS")"
+	docker_opts+=(-e "SHELLCHECK_OPTS=${scratch}")
+	echo "INFO: set SHELLCHECK_OPTS from config file"
+else
+	echo "INFO: no SHELLCHECK_OPTS config file found"
+fi
+
+echo '~~~ Generating file list'
+declare total_files
+scratch="$(mktemp)"
+
+if [ -x "${CONFIG_DIR}/shellcheck/ls-files" ]; then
+	echo "INFO: generating files using ls-files"
+
+	pushd "${CODE_DIR}" > /dev/null
+	"${CONFIG_DIR}/shellcheck/ls-files" > "${scratch}"
+	popd > /dev/null
+else
+	echo "INFO: no ls-files script; finding files from git ls-files"
+
+	declare shebang
+	pushd "${CODE_DIR}" > /dev/null
+	while read -r file; do
+		shebang="$(head -n 1 "${file}")"
+
+		if [ "${shebang}" = '#!/bin/bash' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/bin/sh' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/bin/dash' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/bin/ksh' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/usr/bin/env bash' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/usr/bin/env sh' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/usr/bin/env dash' ]; then
+			echo "${file}" >> "${scratch}"
+		elif [ "${shebang}" = '#!/usr/bin/env ksh' ]; then
+			echo "${file}" >> "${scratch}"
+		else
+			case "${file}" in
+				*.sh)
+					echo "${file}" >> "${scratch}"
+					;;
+			esac
+		fi
+	done < <(git ls-files)
+	popd > /dev/null
+fi
+
+# NOTE: GNU/BSD ouput differents amounts of leading whitespace. Strip all
+# leading whitespace so cut works correctly
+total_files="$(wc -l "${scratch}" | sed -E 's/^[[:space:]]+//g' | cut -d ' ' -f 1)"
+
+echo "INFO: found ${total_files} file(s)"
+
+if [ "${total_files}" -eq 0 ]; then
+	echo "INFO: nothing to check; skipping"
+	exit 7
+else
+	echo '~~~ Running shellcheck'
+	docker-compose run "${docker_opts[@]}" -v "${CODE_DIR}:/code" -w /code shellcheck shellcheck-tap < "${scratch}"
+fi

@@ -15,7 +15,7 @@ metadata_command() {
 
 			;;
 		*)
-			echo "Cannot handle $@" 1>&2
+			echo "Cannot handle $*" 1>&2
 			return 1
 	esac
 }
@@ -27,7 +27,7 @@ main() {
 			metadata_command "$@"
 			;;
 		*)
-			echo "Cannot handle $@" 1>&2
+			echo "Cannot handle $*" 1>&2
 			return 1
 	esac
 }

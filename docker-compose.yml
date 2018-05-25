@@ -6,6 +6,15 @@ services:
 
   rubocop:
     build: rubocop
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
+
+  shellcheck:
+    build: shellcheck
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
 
   api:
     build: test/fake_api
