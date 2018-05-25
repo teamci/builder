@@ -15,7 +15,5 @@ set +e
 exit_code=$?
 set -e
 
-echo $@
-
 source .buildkite/hooks/post-command
 exit "${exit_code}"

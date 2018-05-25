@@ -16,7 +16,7 @@ end
 
 def warning_level(level)
   case level
-  when "error", 'fatal' then 'failure'
+  when 'error', 'fatal' then 'failure'
   when 'warning' then 'warning'
   else 'notice'
   end
