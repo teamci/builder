@@ -73,5 +73,5 @@ if [ "${total_files}" -eq 0 ]; then
 	exit 7
 else
 	echo '~~~ Running shellcheck'
-	xargs docker-compose run "${docker_opts[@]}" -v "${CODE_DIR}:/code" -w /code shellcheck -f gcc < "${scratch}"
+	docker-compose run "${docker_opts[@]}" -v "${CODE_DIR}:/code" -w /code shellcheck shellcheck-tap < "${scratch}"
 fi

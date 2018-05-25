@@ -30,6 +30,15 @@ setup() {
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 
+	# Test for annotation keys
+	echo "${output}" | grep -qF 'filename:'
+	echo "${output}" | grep -qF 'blob_href:'
+	echo "${output}" | grep -qF 'start_line:'
+	echo "${output}" | grep -qF 'end_line:'
+	echo "${output}" | grep -qF 'warning_level:'
+	echo "${output}" | grep -qF 'message:'
+	echo "${output}" | grep -qF 'title:'
+
 	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 

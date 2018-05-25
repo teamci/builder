@@ -1,6 +1,6 @@
 ENV:=tmp/env
 
-DOCKER_IMAGE_FILES:=$(shell find {syntax,rubocop} -print)
+DOCKER_IMAGE_FILES:=$(shell find {syntax,rubocop,shellcheck} -print)
 
 $(ENV): docker-compose.yml $(DOCKER_IMAGE_FILES) test/fake_api/*
 	docker-compose build

@@ -26,6 +26,8 @@ sync_code() {
 	fi
 
 	export CODE_DIR="${TEAMCI_CODE_DIR}/${repo}"
+	export TEAMCI_REPO_SLUG="${repo}"
+	export TEAMCI_COMMIT="${head_sha}"
 
 	if [ -d "${CODE_DIR}/.git" ]; then
 		pushd "${CODE_DIR}" > /dev/null

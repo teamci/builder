@@ -8,7 +8,10 @@ services:
     build: rubocop
 
   shellcheck:
-    image: koalaman/shellcheck:v0.4.7
+    build: shellcheck
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
 
   api:
     build: test/fake_api
