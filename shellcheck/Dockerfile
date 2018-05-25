@@ -1,8 +1,6 @@
-FROM ruby:2.5
+FROM ubuntu:17.10
 
-RUN apt-get update && apt-get install -y ghc cabal-install
-RUN cabal update && cabal install ShellCheck
-
-ENV PATH /root/.cabal/bin:$PATH
+RUN apt-get update && apt-get install -y \
+	shellcheck ruby
 
 COPY tapify.rb shellcheck-tap /usr/local/bin/
