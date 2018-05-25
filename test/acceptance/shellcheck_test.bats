@@ -18,6 +18,8 @@ setup() {
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 
+	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
+
 	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 
@@ -29,6 +31,8 @@ setup() {
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
+
+	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
 
 	# Test for annotation keys
 	echo "${output}" | grep -qF 'filename:'

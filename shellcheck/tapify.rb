@@ -21,6 +21,7 @@ end
 input_files = File.read(ARGV[0]).lines.map(&:chomp)
 error_results = Array(JSON.load($stdin))
 
+$stdout.puts('--- TAP')
 $stdout.puts("1..#{input_files.size}")
 
 input_files.each_with_index do |file_name, i|
@@ -50,3 +51,5 @@ input_files.each_with_index do |file_name, i|
     $stdout.puts(yaml.join)
   end
 end
+
+$stdout.puts('--- TAP')
