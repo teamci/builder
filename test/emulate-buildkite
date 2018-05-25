@@ -2,7 +2,10 @@
 
 set -euo pipefail
 
-export BUILDKITE_LABEL="$(basename "${1}")"
+declare label
+label="$(basename "${1}")"
+
+export "BUILDKITE_LABEL=${label}"
 
 source .buildkite/hooks/pre-command
 

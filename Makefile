@@ -18,7 +18,8 @@ test-lint:
 	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 -f gcc \
 		$(wildcard script/*) \
 		$(wildcard .buildkite/hooks/*) \
-		$(wildcard test/stubs/bin/*)
+		$(wildcard test/stubs/bin/*) \
+		test/emulate-buildkite
 
 .PHONY: test-acceptance
 test-acceptance: FILE=test/acceptance/*_bats
