@@ -95,8 +95,7 @@ sync_config() {
 
 docker_build() {
 	echo '~~~ Building :docker:'
-	docker-compose build syntax rubocop
-	docker-compose pull
+	docker-compose build syntax rubocop shellcheck
 }
 
 if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
