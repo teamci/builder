@@ -7,7 +7,11 @@ require 'json'
 require 'yaml'
 
 def blob_url(file_name)
-  "https://github.com/#{ENV.fetch('TEAMCI_REPO_SLUG')}/blob/#{ENV.fetch('TEAMCI_COMMIT')}/#{file_name}"
+  format('https://github.com/%<slug>s/blob/%<commit>s/%<file>s', {
+    slug: ENV.fetch('TEAMCI_REPO_SLUG'),
+    commit: ENV.fetch('TEAMCI_COMMIT'),
+    file: file_name
+  })
 end
 
 def warning_level(level)
@@ -19,7 +23,7 @@ def warning_level(level)
 end
 
 input_files = File.read(ARGV[0]).lines.map(&:chomp)
-error_results = Array(JSON.load($stdin))
+error_results = Array(JSON.parse($stdin.read))
 
 $stdout.puts('--- TAP')
 $stdout.puts("1..#{input_files.size}")
