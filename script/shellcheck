@@ -7,6 +7,10 @@ buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Shellcheck - st
 declare -a docker_opts=(--rm)
 declare scratch
 
+echo '~~~ Software versions'
+echo '$ shellcheck --version'
+docker-compose run --rm shellcheck shellcheck --version
+
 echo '~~~ Preparing options'
 
 if [ -f "${CONFIG_DIR}/shellcheck/SHELLCHECK_OPTS" ]; then
