@@ -95,7 +95,7 @@ sync_config() {
 
 docker_build() {
 	echo '~~~ Building :docker:'
-	docker-compose build syntax rubocop shellcheck editorconfig
+	docker-compose build syntax rubocop shellcheck editorconfig eslint
 }
 
 if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then

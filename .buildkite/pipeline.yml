@@ -10,3 +10,6 @@ steps:
 
   - label: editorconfig
     command: script/editorconfig
+
+  - label: eslint
+    command: script/eslint
