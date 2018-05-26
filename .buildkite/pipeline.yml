@@ -7,3 +7,6 @@ steps:
 
   - label: shellcheck
     command: script/shellcheck
+
+  - label: editorconfig
+    command: script/editorconfig

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	if [ ! -f .editorconfig ]; then
+		echo "No .editorconfig; skipping"
+		return 7
+	fi
+
+	local counter=1 failures=0 scratch ignore_file total
+	scratch="$(mktemp)"
+	ignore_file="$(mktemp)"
+
+	cat << EOF > "${ignore_file}"
+.editorconfig
+.editorconfigignore
+.gitmodules
+.gitattributes
+EOF
+
+	if [ -f .editorconfigignore ]; then
+		cat .editorconfigignore >> "${ignore_file}"
+	fi
+
+	comm -23 <(sort -) <(sort "${ignore_file}") > "${scratch}"
+
+	total="$(wc -l "${scratch}" | sed 's/^[[:space:]]+//' | cut -d ' ' -f 1)"
+
+	echo "--- TAP"
+	echo "1..${total}"
+
+	while read -r file; do
+		if [ -z "$(editorconfig "${PWD}/${file}")" ]; then
+			echo "not ok ${counter} - .editorconfig covers ${file}"
+			((++failures))
+		else
+			echo "ok ${counter} - .editorconfig covers ${file}"
+		fi
+		((++counter))
+	done < "${scratch}"
+
+	echo "--- TAP"
+
+	if [ "${failures}" -eq 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+main "$@"
