@@ -4,6 +4,9 @@ services:
   syntax:
     build: syntax
 
+  editorconfig:
+    build: editorconfig
+
   rubocop:
     build: rubocop
     environment:

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" '.editorconfig covers files in source control'
+
+declare scratch
+
+echo '~~~ Software versions'
+echo '$ editorconfig --version'
+docker-compose run --rm editorconfig editorconfig --version
+
+echo '~~~ Generating file list'
+scratch="$(mktemp)"
+
+pushd "${CODE_DIR}" > /dev/null
+git ls-files > "${scratch}"
+popd > /dev/null
+
+echo '~~~ Testing coverage'
+docker-compose run -v "${CODE_DIR}:/code" -w /code editorconfig < "${scratch}"
