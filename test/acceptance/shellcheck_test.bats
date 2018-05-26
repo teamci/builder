@@ -3,8 +3,8 @@ setup() {
 	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
 
 	# Required metadata, but scripts continue if these cannot be cloned
-	buildkite-agent meta-data set 'teamci.config.repo' 'no-op/no-op'
-	buildkite-agent meta-data set 'teamci.config.branch' 'master'
+	buildkite-agent meta-data set 'teamci.config.repo' 'eslint/config'
+	buildkite-agent meta-data set 'teamci.config.branch' 'pass'
 
 	rm -rf "${TEAMCI_CODE_DIR}/"*
 }

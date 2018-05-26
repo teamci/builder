@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	local output exit_code
+
+	local config_file=/config/eslint/eslintrc.json
+	local ignore_file=/config/eslint/eslintignore
+
+	output="$(mktemp)"
+
+	echo '~~~ Checking configuration'
+
+	if [ ! -f "${config_file}" ]; then
+		echo 'INFO: no configuration file; skipping"'
+		return 7
+	fi
+
+	local -a eslint_args=(-c "${config_file}" -f json --output-file "${output}")
+
+	if [ -f "${ignore_file}" ]; then
+		echo 'INFO: found ignore configuration file'
+		eslint_args+=(--ignore-path "${ignore_file}")
+	fi
+
+	echo '~~~ Running eslint'
+	set +e
+	eslint "${eslint_args[@]}" .
+	exit_code=$?
+	set -e
+
+	if [ "$(cat "${output}")" = "[]" ]; then
+		echo "INFO: no lintable files found; skipping"
+		return 7
+	fi
+
+	tapify.rb < "${output}"
+
+	if [ "${exit_code}" -eq 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+main "$@"
