@@ -21,6 +21,10 @@ def warning_level(level)
   end
 end
 
+def end_line(msg)
+  msg.key?('endLine') ? msg.fetch('endLine') : msg.fetch('line')
+end
+
 report = JSON.parse($stdin.read)
 
 $stdout.puts('--- TAP')
@@ -34,15 +38,15 @@ report.each_with_index do |data, i|
     $stdout.puts("ok #{i + 1} - #{path}")
   else
     $stdout.puts("not ok #{i + 1} - #{path}")
-    annotations = messages.map do |message|
+    annotations = messages.map do |msg|
       {
         'filename' => path,
         'blob_href' => blob_url(path),
-        'start_line' => message.fetch('line'),
-        'end_line' => message.key?('endLine') ? message.fetch('endLine') : message.fetch('line'),
-        'warning_level' => warning_level(message.fetch('severity')),
-        'message' => message.fetch('message'),
-        'title' => "ESLint #{message.fetch('ruleId')}"
+        'start_line' => msg.fetch('line'),
+        'end_line' => end_line(msg),
+        'warning_level' => warning_level(msg.fetch('severity')),
+        'message' => msg.fetch('message'),
+        'title' => "ESLint #{msg.fetch('ruleId')}"
       }
     end
     yaml = YAML.dump(annotations).lines.map do |line|
