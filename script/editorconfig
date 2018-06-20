@@ -18,4 +18,8 @@ git ls-files > "${scratch}"
 popd > /dev/null
 
 echo '~~~ Testing coverage'
-docker-compose run -v "${CODE_DIR}:/code" -w /code editorconfig < "${scratch}"
+docker-compose run \
+	--rm \
+	-v "${CODE_DIR}:/code" \
+	-w /code \
+	editorconfig < "${scratch}"
