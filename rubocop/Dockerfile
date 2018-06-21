@@ -1,4 +1,6 @@
-FROM ruby:2.5
+FROM ruby:2.5-alpine
+
+RUN apk add --update ruby-dev gcc make libc-dev
 
 RUN gem install rubocop -v '0.57.2'
 
