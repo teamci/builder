@@ -20,4 +20,14 @@ class PipelineTest < MiniTest::Test
       assert File.executable?(command), "#{command} is not executable"
     end
   end
+
+  def test_pipline_calls_all_check_scripts
+    Dir['script/*'].each do |script|
+      step = pipeline.fetch('steps').find do |entry|
+        entry.dig('command') == script
+      end
+
+      assert step, "No step for: #{script}"
+    end
+  end
 end

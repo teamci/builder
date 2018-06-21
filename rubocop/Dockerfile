@@ -1,10 +1,6 @@
-FROM ruby:2.5-alpine
+FROM ruby:2.5
 
-RUN apk add --update bash
-
-ENV PATH /usr/local/bundle/bin:$PATH
-
-RUN gem install rubocop
+RUN gem install rubocop -v '0.57.2'
 
 ADD rubocop-tap tapify.rb /usr/local/bin/
 

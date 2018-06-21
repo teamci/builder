@@ -57,6 +57,7 @@ sync_config() {
 	config_repo="$(buildkite-agent meta-data get teamci.config.repo)"
 	config_branch="$(buildkite-agent meta-data get teamci.config.branch)"
 
+	export TEAMCI_CONFIG_REPO_SLUG="${config_repo}"
 	export CONFIG_DIR="${TEAMCI_CODE_DIR}/${config_repo}"
 
 	if [ -d "${CONFIG_DIR}/.git" ]; then

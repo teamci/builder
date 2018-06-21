@@ -13,3 +13,6 @@ steps:
 
   - label: eslint
     command: script/eslint
+
+  - label: custom
+    command: script/custom

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Custom checks'
+
+if [ ! -f "${CONFIG_DIR}/custom/Dockerfile" ]; then
+	echo "No Dockerfile found; skipping"
+	exit 7
+fi
+
+echo '~~~ Building Docker image'
+docker build -t "${TEAMCI_CONFIG_REPO_SLUG}" "${CONFIG_DIR}/custom"
+
+echo '~~~ Running custom check'
+docker run \
+	--rm \
+	-v "${CODE_DIR}:/data" \
+	"${TEAMCI_CONFIG_REPO_SLUG}"
