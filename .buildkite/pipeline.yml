@@ -14,5 +14,8 @@ steps:
   - label: eslint
     command: script/eslint
 
+  - label: gometalinter
+    command: script/gometalinter
+
   - label: custom
     command: script/custom
