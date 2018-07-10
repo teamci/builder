@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	local output exit_code config_file
+
+	output="$(mktemp)"
+	config_file=/config/phpcs/ruleset.xml
+
+	local -a args=(--report=json --report-file=${output})
+
+	echo '~~~ Checking configuration'
+	if [ -f "${config_file}" ]; then
+		echo 'INFO: using custom ruleset.xml'
+		args+=(--standard=${config_file})
+	else
+		echo 'INFO: no custom ruleset.xml found; using defaults.'
+	fi
+
+	echo '~~~ Running phpcs'
+	set +e
+	phpcs "${args[@]}" .
+	exit_code=$?
+	set -e
+
+	if [ "${exit_code}" -eq 3 ]; then
+		echo 'ERROR: internal error'
+		return 1
+	fi
+
+	if [ "$(jq -re '.files | length' "${output}")" -eq 0 ]; then
+		echo 'No files found, skipping'
+		return 7
+	fi
+
+	tapify.rb < "${output}"
+
+	if [ "${exit_code}" -eq 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+main "$@"

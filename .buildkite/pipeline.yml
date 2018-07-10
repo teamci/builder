@@ -17,5 +17,8 @@ steps:
   - label: gometalinter
     command: script/gometalinter
 
+  - label: phpcs
+    command: script/phpcs
+
   - label: custom
     command: script/custom
