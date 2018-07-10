@@ -8,12 +8,12 @@ main() {
 	output="$(mktemp)"
 	config_file=/config/phpcs/ruleset.xml
 
-	local -a args=(--report=json --report-file=${output})
+	local -a args=("--report=json" "--report-file=${output}")
 
 	echo '~~~ Checking configuration'
 	if [ -f "${config_file}" ]; then
 		echo 'INFO: using custom ruleset.xml'
-		args+=(--standard=${config_file})
+		args+=("--standard=${config_file}")
 	else
 		echo 'INFO: no custom ruleset.xml found; using defaults.'
 	fi
