@@ -4,7 +4,7 @@ require 'minitest/autorun'
 require 'yaml'
 
 class PipelineTest < MiniTest::Test
-  PIPELINE_FILE = '.buildkite/pipeline.yml'
+  PIPELINE_FILE = '.buildkite/pipeline.yml'.freeze
 
   attr_reader :pipeline
 
