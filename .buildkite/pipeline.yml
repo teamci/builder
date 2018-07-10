@@ -14,5 +14,11 @@ steps:
   - label: eslint
     command: script/eslint
 
+  - label: gometalinter
+    command: script/gometalinter
+
+  - label: phpcs
+    command: script/phpcs
+
   - label: custom
     command: script/custom

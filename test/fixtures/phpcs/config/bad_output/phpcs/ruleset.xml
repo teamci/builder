@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<ruleset name="TeamCI" namespace="TeamCI">
+ <rule ref="PEAR">
+  <exclude name="Foo.Bar"/>
+ </rule>
+</ruleset>

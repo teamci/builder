@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'PHP CodeSniffer - lint php code'
+
+echo '~~~ Software versions'
+
+echo '$ phpcs --version'
+docker-compose run --rm phpcs phpcs --version
+
+docker-compose run \
+	--rm \
+	-v "${CODE_DIR}:/code" \
+	-v "${CONFIG_DIR}:/config" \
+	-w "/code" \
+	phpcs

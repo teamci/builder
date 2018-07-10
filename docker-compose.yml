@@ -25,6 +25,18 @@ services:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
+  gometalinter:
+    build: gometalinter
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
+
+  phpcs:
+    build: phpcs
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
+
   api:
     build: test/fake_api
     ports:
