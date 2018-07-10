@@ -29,9 +29,9 @@ $stdout.puts("1..#{files.keys.size}")
 
 files.each_with_index do |(path, data), i|
   # Don't ask me why, but it seems / is escaped in the output. PHP?
-  file_name = path.gsub('\/', '/').gsub(/^\//, '')
+  file_name = path.gsub('\/', '/').gsub(%r{^/}, '')
 
-  if data.fetch('errors') == 0
+  if data.fetch('errors').zero?
     $stdout.puts("ok #{i + 1} - #{file_name}")
   else
     $stdout.puts("file_name ok #{i + 1} - #{file_name}")
