@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	local output exit_code config_file
+
+	output="$(mktemp)"
+	config_file=/config/stylelint/config.json
+
+	local -a args=("--formatter" "json")
+
+	echo '~~~ Checking configuration'
+	if [ -f "${config_file}" ]; then
+		echo 'INFO: using custom config.json'
+		args+=("--config" "../${config_file}")
+	else
+		echo 'INFO: no custom config.json found; using standard config.'
+		args+=("--config" "../defaults/config.json")
+	fi
+
+	echo '~~~ Running stylelint'
+	set +e
+	stylelint "${args[@]}" "**/*.{css,scss,less,sss}" > "${output}"
+	exit_code=$?
+	set -e
+
+	if [ "$(jq -re '. | length' "${output}")" -eq 0 ]; then
+		return 7
+	fi
+
+	tapify.rb < "${output}"
+
+	if [ "${exit_code}" -eq 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+main "$@"
