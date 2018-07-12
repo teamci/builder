@@ -8,6 +8,10 @@ main() {
 	local config_file=/config/gometalinter/config.json
 	local -a gometalinter_args=(--json)
 
+	echo '~~~ Software versions'
+	echo '$ gometalinter --version'
+	gometalinter --version
+
 	output="$(mktemp)"
 
 	echo '~~~ Checking configuration'

@@ -6,10 +6,6 @@ buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" '.editorconfig c
 
 declare scratch
 
-echo '~~~ Software versions'
-echo '$ editorconfig --version'
-docker-compose run --rm editorconfig editorconfig --version
-
 echo '~~~ Generating file list'
 scratch="$(mktemp)"
 

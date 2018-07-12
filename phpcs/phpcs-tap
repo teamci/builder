@@ -10,6 +10,10 @@ main() {
 
 	local -a args=("--report=json" "--report-file=${output}")
 
+	echo '~~~ Software versions'
+	echo '$ phpcs --version'
+	phpcs --version
+
 	echo '~~~ Checking configuration'
 	if [ -f "${config_file}" ]; then
 		echo 'INFO: using custom ruleset.xml'

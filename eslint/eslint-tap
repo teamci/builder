@@ -10,6 +10,10 @@ main() {
 
 	output="$(mktemp)"
 
+	echo '~~~ Software versions'
+	echo '$ eslint --version'
+	eslint --version
+
 	echo '~~~ Checking configuration'
 
 	if [ ! -f "${config_file}" ]; then

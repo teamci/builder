@@ -8,6 +8,10 @@ main() {
 		return 7
 	fi
 
+	echo '~~~ Software versions'
+	echo '$ editorconfig --version'
+	editorconfig --version
+
 	local counter=1 failures=0 scratch ignore_file total
 	scratch="$(mktemp)"
 	ignore_file="$(mktemp)"
