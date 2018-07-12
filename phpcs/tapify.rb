@@ -34,7 +34,7 @@ files.each_with_index do |(path, data), i|
   if data.fetch('errors').zero?
     $stdout.puts("ok #{i + 1} - #{file_name}")
   else
-    $stdout.puts("file_name ok #{i + 1} - #{file_name}")
+    $stdout.puts("not ok #{i + 1} - #{file_name}")
 
     annotations = data.fetch('messages').map do |entry|
       {
