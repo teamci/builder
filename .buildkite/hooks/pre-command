@@ -103,6 +103,7 @@ docker_build() {
 		phpcs \
 		rubocop \
 		shellcheck \
+		stylelint \
 		syntax
 }
 

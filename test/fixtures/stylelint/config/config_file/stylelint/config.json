@@ -1,0 +1,6 @@
+{
+  "extends": "/usr/local/lib/node_modules/stylelint-config-standard",
+  "rules": {
+    "font-family-no-missing-generic-family-keyword": null
+  }
+}

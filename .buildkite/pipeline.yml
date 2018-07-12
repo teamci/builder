@@ -20,5 +20,8 @@ steps:
   - label: phpcs
     command: script/phpcs
 
+  - label: stylelint
+    command: script/stylelint
+
   - label: custom
     command: script/custom

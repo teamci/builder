@@ -37,6 +37,12 @@ services:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
+  stylelint:
+    build: stylelint
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
+
   api:
     build: test/fake_api
     ports:
