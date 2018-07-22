@@ -18,8 +18,6 @@ setup() {
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
 	[ -n "$(buildkite-agent meta-data get 'teamci.gometalinter.title')" ]
 }
 
@@ -52,6 +50,8 @@ setup() {
 
 	run test/emulate-buildkite script/gometalinter
 
+	# NOTE: there's no way to determine the skip case without an explicit
+	# file list.
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 
