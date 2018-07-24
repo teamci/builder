@@ -97,6 +97,7 @@ sync_config() {
 docker_build() {
 	echo '~~~ Building :docker:'
 	docker-compose build \
+		credo \
 		editorconfig \
 		eslint \
 		gometalinter \

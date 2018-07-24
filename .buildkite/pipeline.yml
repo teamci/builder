@@ -23,5 +23,8 @@ steps:
   - label: stylelint
     command: script/stylelint
 
+  - label: credo
+    command: script/credo
+
   - label: custom
     command: script/custom
