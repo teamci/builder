@@ -43,6 +43,12 @@ services:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
+  credo:
+    build: credo
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
+
   api:
     build: test/fake_api
     ports:

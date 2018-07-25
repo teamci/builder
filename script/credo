@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'credo - Elixir linting'
+
+docker-compose run \
+	--rm \
+	-v "${CODE_DIR}:/code" \
+	-v "${CONFIG_DIR}:/config" \
+	-w "/code" \
+	credo

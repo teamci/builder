@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	local output exit_code config_file
+
+	output="$(mktemp)"
+	config_file=/config/credo/config.exs
+
+	local -a args=("--format=flycheck")
+
+	echo '~~~ Versions'
+	echo '$ elixir --version'
+	elixir --version
+	echo '$ mix credo --version'
+	mix credo --version
+
+	if [ -f "${config_file}" ]; then
+		echo '~~~ Linking global config'
+		mkdir -p config
+		cp "${config_file}" config/.credo.exs
+	else
+		echo '~~~ Using default config'
+	fi
+
+	echo '~~~ Running credo list'
+	set +e
+	mix credo list "${args[@]}" > "${output}"
+	exit_code=$?
+	set -e
+
+	if [ "${exit_code}" -eq 0 ]; then
+		return 0
+	else
+		tapify.rb < "${output}"
+		return 1
+	fi
+}
+
+main "$@"
