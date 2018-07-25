@@ -8,7 +8,7 @@ main() {
 	output="$(mktemp)"
 	config_file=/config/credo/config.exs
 
-	local -a args=(--format=flycheck)
+	local -a args=("--format=flycheck")
 
 	echo '~~~ Versions'
 	echo '$ elixir --version'
