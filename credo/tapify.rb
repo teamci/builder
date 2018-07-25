@@ -23,15 +23,15 @@ end
 
 report = $stdin.read.lines
 
-if report.empty?
-  exit
-end
+exit if report.empty?
+
+FORMAT = /^(?<file>[^:]+):(?<line>\d+):\d+:\d*\s(?<level>[A-Z]):\s(?<msg>.+)$/
 
 $stdout.puts('--- TAP')
 $stdout.puts("1..#{report.size}")
 
 report.each_with_index do |data, i|
-  result = data.match(/^(?<file>[^:]+):(?<line>\d+):\d+:\d*\s(?<level>[A-Z]):\s(?<msg>.+)$/)
+  result = data.match(FORMAT)
   file_name = result[:file]
 
   $stdout.puts("not ok #{i + 1} - #{file_name}")
