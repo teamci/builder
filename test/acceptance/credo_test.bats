@@ -15,8 +15,6 @@ setup() {
 
 	run test/emulate-buildkite script/credo
 
-	echo "${output}"
-
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 
