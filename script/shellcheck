@@ -37,6 +37,11 @@ else
 	declare shebang
 	pushd "${CODE_DIR}" > /dev/null
 	while read -r file; do
+		# git ls-files seems to output directories for uninitiated submodules
+		if [ ! -f "${file}" ]; then
+			continue
+		fi
+
 		shebang="$(head -n 1 "${file}")"
 
 		if [ "${shebang}" = '#!/bin/bash' ]; then
