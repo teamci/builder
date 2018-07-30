@@ -108,10 +108,22 @@ docker_build() {
 		syntax
 }
 
+check_whitelist() {
+	echo '~~~ Checking whitelist'
+
+	local whitelist="${CONFIG_DIR}/whitelist"
+
+	if [ -f "${whitelist}" ] && ! grep -qF -- "${BUILDKITE_LABEL}" "${whitelist}"; then
+		echo "${BUILDKITE_LABEL} is not whitelisted. Skipping."
+		return 7
+	fi
+}
+
 if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	get_access_token
 	sync_code
 	sync_config
+	check_whitelist
 
 	if [ -n "${CI:-}" ]; then
 		docker_build

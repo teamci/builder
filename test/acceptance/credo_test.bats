@@ -87,3 +87,33 @@ setup() {
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }
+
+@test "credo: whitelisted" {
+	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
+	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
+	buildkite-agent meta-data set 'teamci.config.branch' 'whitelist'
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+	[ -n "${output}" ]
+	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
+
+	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
+}
+
+@test "credo: blacklisted" {
+	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
+	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
+	buildkite-agent meta-data set 'teamci.config.branch' 'blacklist'
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 7 ]
+	[ -n "${output}" ]
+	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
+
+	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
+}
