@@ -94,18 +94,9 @@ sync_config() {
 	fi
 }
 
-docker_build() {
-	echo '~~~ Building :docker:'
-	docker-compose build \
-		credo \
-		editorconfig \
-		eslint \
-		gometalinter \
-		phpcs \
-		rubocop \
-		shellcheck \
-		stylelint \
-		syntax
+docker_pull() {
+	echo '~~~ Pulling image :docker:'
+	docker-compose pull "${BUILDKITE_LABEL}"
 }
 
 check_whitelist() {
@@ -126,6 +117,6 @@ if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	check_whitelist
 
 	if [ -n "${CI:-}" ]; then
-		docker_build
+		docker_pull
 	fi
 fi

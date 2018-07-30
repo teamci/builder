@@ -9,42 +9,49 @@ services:
 
   rubocop:
     build: rubocop
+    image: teamci/rubocop:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   shellcheck:
     build: shellcheck
+    image: teamci/shellcheck:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   eslint:
     build: eslint
+    image: teamci/eslint:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   gometalinter:
     build: gometalinter
+    image: teamci/gometalinter:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   phpcs:
     build: phpcs
+    image: teamci/phpcs:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   stylelint:
     build: stylelint
+    image: teamci/stylelint:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   credo:
     build: credo
+    image: teamci/credo:v0.1.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
