@@ -8,7 +8,7 @@ main() {
 	output="$(mktemp)"
 	config_file=/config/stylelint/config.json
 
-	local -a args=("--formatter" "json")
+	local -a args=("--formatter" "json" "--ignore-pattern" "**/*.min.css")
 
 	echo '~~~ Checking configuration'
 	if [ -f "${config_file}" ]; then
