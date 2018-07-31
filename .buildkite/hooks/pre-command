@@ -28,7 +28,7 @@ sync_code() {
 
 	if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
 		echo "FATAL: Missing repo/sha/branch metadata" 1>&2
-		exit 1
+		return 1
 	fi
 
 	export CODE_DIR="${TEAMCI_CODE_DIR}/${repo}"
