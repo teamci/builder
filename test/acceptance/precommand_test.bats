@@ -84,3 +84,16 @@ setup() {
 
 	[ $status -eq 0 ]
 }
+
+@test "precommand: [REGRESSION] custom image pull on CI" {
+	buildkite-agent meta-data set 'teamci.repo.slug' 'custom/code'
+	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	buildkite-agent meta-data set 'teamci.config.repo' 'custom/config'
+	buildkite-agent meta-data set 'teamci.config.branch' 'pass'
+
+	export CI=true
+	run test/emulate-buildkite script/custom
+	unset CI
+
+	[ $status -eq 0 ]
+}

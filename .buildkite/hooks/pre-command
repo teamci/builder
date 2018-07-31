@@ -106,8 +106,13 @@ sync_config() {
 }
 
 docker_pull() {
-	echo '~~~ Pulling image :docker:'
-	docker-compose pull "${BUILDKITE_LABEL}"
+	if [ "${BUILDKITE_LABEL}" = 'custom' ]; then
+		# skip this; no docker-compose entry
+		return 0
+	else
+		echo '~~~ Pulling image :docker:'
+		docker-compose pull "${BUILDKITE_LABEL}"
+	fi
 }
 
 set_title() {
