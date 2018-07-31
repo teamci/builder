@@ -11,8 +11,12 @@ metadata_command() {
 		get)
 			local key="${2}"
 
-			cat "${BUILDKITE_AGENT_METADIR}/${key}"
-
+			if [ -f "${BUILDKITE_AGENT_METADIR}/${key}" ]; then
+				cat "${BUILDKITE_AGENT_METADIR}/${key}"
+			else
+				echo "${key} not set" 1>&2
+				return 1
+			fi
 			;;
 		*)
 			echo "Cannot handle $*" 1>&2
