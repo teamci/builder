@@ -6,7 +6,7 @@ get_access_token() {
 	local scratch
 	scratch="$(mktemp)"
 
-	echo '~~~ Fetching Access Token'
+	echo '~~~ :json: Fetching Access Token'
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
 	if curl -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}"; then
 		echo 'INFO: retrieved git access token'
@@ -19,7 +19,7 @@ get_access_token() {
 }
 
 sync_code() {
-	echo '~~~ Syncing code'
+	echo '~~~ :git: Cloning code'
 	local repo head_sha head_branch
 
 	repo="$(buildkite-agent meta-data get teamci.repo.slug)"
@@ -61,7 +61,7 @@ sync_code() {
 }
 
 sync_config() {
-	echo "~~~ Syncing config repo"
+	echo "~~~ :git: Syncing config repo"
 
 	local config_repo config_branch clone_status
 
@@ -110,13 +110,13 @@ docker_pull() {
 		# skip this; no docker-compose entry
 		return 0
 	else
-		echo '~~~ Pulling image :docker:'
+		echo '~~~ :docker: Pulling image'
 		docker-compose pull "${BUILDKITE_LABEL}"
 	fi
 }
 
 set_title() {
-	echo '~~~~ Setting title'
+	echo '~~~~ :house_with_garden: Setting title'
 
 	buildkite-agent meta-data set \
 		"teamci.${BUILDKITE_LABEL}.title" \
@@ -124,7 +124,7 @@ set_title() {
 }
 
 check_whitelist() {
-	echo '~~~ Checking whitelist'
+	echo '~~~ :white_check_mark: Checking whitelist'
 
 	local whitelist="${CONFIG_DIR}/whitelist"
 
