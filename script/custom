@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+source .buildkite/hooks/pre-check
+
 if [ ! -f "${CONFIG_DIR}/custom/Dockerfile" ]; then
 	echo "No Dockerfile found; skipping"
 	exit 7

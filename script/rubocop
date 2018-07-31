@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+source .buildkite/hooks/pre-check
+
 echo '~~~ Software versions'
 
 echo '$ ruby --version'

@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+source .buildkite/hooks/pre-check
+
 declare scratch
 
 echo '~~~ Generating file list'
