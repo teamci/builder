@@ -24,6 +24,18 @@ setup() {
 	echo "${output}" | grep -qF 'FATAL'
 }
 
+@test "precommand: upstream branch non-existent" {
+	buildkite-agent meta-data set 'teamci.head_branch' 'deleted-upstream'
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 7 ]
+	[ -n "${output}" ]
+
+	echo "${output}" | grep -qF 'WARN'
+	echo "${output}" | grep -qF 'deleted-upstream'
+}
+
 @test "precommand: blacklisted" {
 	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
 	buildkite-agent meta-data set 'teamci.config.branch' 'blacklist'

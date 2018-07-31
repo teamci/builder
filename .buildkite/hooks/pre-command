@@ -19,7 +19,7 @@ get_access_token() {
 }
 
 sync_code() {
-	echo '~~~ Cloning code'
+	echo '~~~ Syncing code'
 	local repo head_sha head_branch
 
 	repo="$(buildkite-agent meta-data get teamci.repo.slug)"
@@ -36,10 +36,12 @@ sync_code() {
 	export TEAMCI_COMMIT="${head_sha}"
 
 	if [ -d "${CODE_DIR}/.git" ]; then
+		echo '~~~ :git: Updating origin with access token'
 		pushd "${CODE_DIR}" > /dev/null
 
 		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git"
 	else
+		echo "~~~ :git: Cloning ${repo}"
 		mkdir -p "${CODE_DIR}"
 
 		git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}"
@@ -47,12 +49,15 @@ sync_code() {
 		pushd "${CODE_DIR}" > /dev/null
 	fi
 
-	git fetch -v --prune origin "${head_branch}"
-	git checkout -f "${head_sha}"
+	echo '~~~ :git: Checking out'
 
-	popd > /dev/null
-
-	echo "INFO: code ${head_branch} @ ${head_sha} ready"
+	if git fetch -v --prune origin "${head_branch}" && git checkout -f "${head_sha}"; then
+		echo "INFO: code ${head_branch} @ ${head_sha} ready"
+		popd > /dev/null
+	else
+		echo "WARN: could not sync code. Was the branch deleted upstream? Skipping check."
+		return 7
+	fi
 }
 
 sync_config() {
