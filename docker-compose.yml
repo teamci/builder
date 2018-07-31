@@ -51,7 +51,7 @@ services:
 
   credo:
     build: credo
-    image: teamci/credo:v0.1.0
+    image: teamci/credo:v0.1.1
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
