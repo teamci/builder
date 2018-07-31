@@ -28,8 +28,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }
 
 @test "credo: valid repo passes" {
@@ -42,8 +40,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }
 
 @test "credo: no matching files" {
@@ -54,8 +50,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }
 
 @test "credo: config file exists" {
@@ -69,8 +63,6 @@ setup() {
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }
 
 @test "credo: config parse errors" {
@@ -84,36 +76,4 @@ setup() {
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
-}
-
-@test "credo: whitelisted" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'whitelist'
-
-	run test/emulate-buildkite script/credo
-
-	[ $status -eq 0 ]
-	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
-}
-
-@test "credo: blacklisted" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'blacklist'
-
-	run test/emulate-buildkite script/credo
-
-	[ $status -eq 7 ]
-	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }

@@ -19,8 +19,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.phpcs.title')" ]
 }
 
 @test "phpcs: invalid repo fails" {
@@ -42,8 +40,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.phpcs.title')" ]
 }
 
 @test "phpcs: skips when no matching files" {
@@ -54,8 +50,6 @@ setup() {
 
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.phpcs.title')" ]
 }
 
 @test "phpcs: config file exists" {
@@ -69,8 +63,6 @@ setup() {
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.phpcs.title')" ]
 }
 
 @test "phpcs: exit code 3" {
@@ -87,6 +79,4 @@ setup() {
 
 	# Catch our error message is printed
 	echo "${output}" | grep -qFi 'internal error'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.phpcs.title')" ]
 }

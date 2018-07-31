@@ -6,6 +6,8 @@ $stderr.sync = true
 require 'json'
 require 'yaml'
 
+FORMAT = /^(?<file>[^:]+):(?<line>\d+):\d+:\d*\s(?<level>[A-Z]):\s(?<msg>.+)$/
+
 def blob_url(file_name)
   format('https://github.com/%<slug>s/blob/%<commit>s/%<file>s', {
     slug: ENV.fetch('TEAMCI_REPO_SLUG'),
@@ -21,11 +23,11 @@ def warning_level(level)
   end
 end
 
-report = $stdin.read.lines
+report = $stdin.read.lines.select do |output|
+  output =~ FORMAT
+end
 
 exit if report.empty?
-
-FORMAT = /^(?<file>[^:]+):(?<line>\d+):\d+:\d*\s(?<level>[A-Z]):\s(?<msg>.+)$/
 
 $stdout.puts('--- TAP')
 $stdout.puts("1..#{report.size}")

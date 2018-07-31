@@ -28,8 +28,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.stylelint.title')" ]
 }
 
 @test "stylelint: parse errors" {
@@ -51,8 +49,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.stylelint.title')" ]
 }
 
 @test "stylelint: valid repo passes" {
@@ -65,8 +61,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.stylelint.title')" ]
 }
 
 @test "stylelint: skips when no matching files" {
@@ -77,8 +71,6 @@ setup() {
 
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.stylelint.title')" ]
 }
 
 @test "stylelint: config file exists" {
@@ -92,6 +84,4 @@ setup() {
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.stylelint.title')" ]
 }

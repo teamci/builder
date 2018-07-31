@@ -17,21 +17,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
-}
-
-@test "rubocop: run after cloning target code" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
 }
 
 @test "rubocop: invalid repo fails" {
@@ -55,8 +40,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }
 
 @test "rubocop: repo with config file" {
@@ -69,23 +52,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
-}
-
-@test "rubocop: second test run with config file" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'with_config'
-	buildkite-agent meta-data set 'teamci.config.repo' 'rubocop/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'with_config'
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
 }
 
 @test "rubocop: repo with RUBOCOP_OPTS" {
@@ -101,6 +67,4 @@ setup() {
 
 	# Grep for debug output that should be triggred by --debug in RUBOCOP_OPTS
 	echo "${output}" | grep -qF 'Inheriting configuration'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }

@@ -20,8 +20,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.eslint.title')" ]
 }
 
 @test "eslint: invalid repo fails" {
@@ -43,8 +41,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.eslint.title')" ]
 }
 
 @test "eslint: no configuration file" {
@@ -58,8 +54,6 @@ setup() {
 
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.eslint.title')" ]
 }
 
 @test "eslint: ignore file" {
@@ -73,8 +67,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.eslint.title')" ]
 }
 
 @test "eslint: no files" {
@@ -85,6 +77,4 @@ setup() {
 
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.eslint.title')" ]
 }

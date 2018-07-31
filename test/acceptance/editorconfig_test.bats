@@ -19,8 +19,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.editorconfig.title')" ]
 }
 
 @test "editorconfig: problematic git files" {
@@ -33,8 +31,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.editorconfig.title')" ]
 }
 
 @test "editorconfig: invalid repo fails" {
@@ -47,8 +43,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.editorconfig.title')" ]
 }
 
 @test "editorconfig: no .editorconfig" {
@@ -62,6 +56,4 @@ setup() {
 
 	# Test that ls-files found 1 out of 2 files in the fixture repo
 	echo "${output}" | grep -iqF 'skip'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.editorconfig.title')" ]
 }

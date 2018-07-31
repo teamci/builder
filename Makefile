@@ -24,10 +24,10 @@ test-lint:
 
 .PHONY: test-acceptance
 test-acceptance: FILE=$(wildcard test/acceptance/*_test.bats)
-test-acceptance: $(ENV) | tmp/buildkite-agent
+test-acceptance: $(ENV)
 	@echo '~~~ Acceptance Tests'
 	@env \
-		BUILDKITE_AGENT_METADIR=$(CURDIR)/tmp/buildkite-agent \
+		BUILDKITE_AGENT_METADIR=$(shell mktemp -d) \
 		FIXTURE_DIR=$(CURDIR)/test/fixtures \
 		PATH=$(CURDIR)/test/stubs/bin:$$PATH \
 		TEAMCI_API_URL=http://localhost:9292 \

@@ -14,8 +14,6 @@ setup() {
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
 	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "syntax: invalid json fails" {
@@ -27,8 +25,6 @@ setup() {
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "syntax: invalid yml fails" {
@@ -40,8 +36,6 @@ setup() {
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
 	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "syntax: no files to syntax" {
@@ -53,8 +47,6 @@ setup() {
 	[ $status -eq 7 ]
 	[ -n "${output}" ]
 	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }
 
 @test "syntax: ls-files script present" {
@@ -65,6 +57,4 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.syntax.title')" ]
 }

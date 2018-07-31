@@ -8,12 +8,18 @@ get_access_token() {
 
 	echo '~~~ Fetching Access Token'
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
-	curl -H 'Accept: application/json' "${access_token_url}" > "${scratch}"
-	export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
+	if curl -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}"; then
+		echo 'INFO: retrieved git access token'
+		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
+	else
+		echo 'FATAL: Could not fetch clone access token. This is an internal error. You can attempt a retry.'
+		echo 'WARN: Skipping this check for now. Contact support if this continues.'
+		return 7
+	fi
 }
 
 sync_code() {
-	echo '~~~ Cloning code'
+	echo '~~~ Syncing code'
 	local repo head_sha head_branch
 
 	repo="$(buildkite-agent meta-data get teamci.repo.slug)"
@@ -22,7 +28,7 @@ sync_code() {
 
 	if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
 		echo "FATAL: Missing repo/sha/branch metadata" 1>&2
-		exit 1
+		return 1
 	fi
 
 	export CODE_DIR="${TEAMCI_CODE_DIR}/${repo}"
@@ -30,10 +36,12 @@ sync_code() {
 	export TEAMCI_COMMIT="${head_sha}"
 
 	if [ -d "${CODE_DIR}/.git" ]; then
+		echo '~~~ :git: Updating origin with access token'
 		pushd "${CODE_DIR}" > /dev/null
 
 		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git"
 	else
+		echo "~~~ :git: Cloning ${repo}"
 		mkdir -p "${CODE_DIR}"
 
 		git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}"
@@ -41,12 +49,15 @@ sync_code() {
 		pushd "${CODE_DIR}" > /dev/null
 	fi
 
-	git fetch -v --prune origin "${head_branch}"
-	git checkout -f "${head_sha}"
+	echo '~~~ :git: Checking out'
 
-	popd > /dev/null
-
-	echo "INFO: code ${head_branch} @ ${head_sha} ready"
+	if git fetch -v --prune origin "${head_branch}" && git checkout -f "${head_sha}"; then
+		echo "INFO: code ${head_branch} @ ${head_sha} ready"
+		popd > /dev/null
+	else
+		echo "WARN: could not sync code. Was the branch deleted upstream? Skipping check."
+		return 7
+	fi
 }
 
 sync_config() {
@@ -95,8 +106,21 @@ sync_config() {
 }
 
 docker_pull() {
-	echo '~~~ Pulling image :docker:'
-	docker-compose pull "${BUILDKITE_LABEL}"
+	if [ "${BUILDKITE_LABEL}" = 'custom' ]; then
+		# skip this; no docker-compose entry
+		return 0
+	else
+		echo '~~~ Pulling image :docker:'
+		docker-compose pull "${BUILDKITE_LABEL}"
+	fi
+}
+
+set_title() {
+	echo '~~~~ Setting title'
+
+	buildkite-agent meta-data set \
+		"teamci.${BUILDKITE_LABEL}.title" \
+		"$(jq -re ".${BUILDKITE_LABEL}" titles.json)"
 }
 
 check_whitelist() {
@@ -114,6 +138,8 @@ if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	get_access_token
 	sync_code
 	sync_config
+
+	set_title
 	check_whitelist
 
 	if [ -n "${CI:-}" ]; then

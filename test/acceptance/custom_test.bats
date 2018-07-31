@@ -19,8 +19,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.custom.title')" ]
 }
 
 @test "custom: no Dockerfile" {
@@ -36,6 +34,4 @@ setup() {
 
 	# Test that ls-files found 1 out of 2 files in the fixture repo
 	echo "${output}" | grep -iqF 'skip'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.custom.title')" ]
 }
