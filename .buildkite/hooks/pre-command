@@ -8,8 +8,14 @@ get_access_token() {
 
 	echo '~~~ Fetching Access Token'
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
-	curl -H 'Accept: application/json' "${access_token_url}" > "${scratch}"
-	export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
+	if curl -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}"; then
+		echo 'INFO: retrieved git access token'
+		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
+	else
+		echo 'FATAL: Could not fetch clone access token. This is an internal error. You can attempt a retry.'
+		echo 'WARN: Skipping this check for now. Contact support if this continues.'
+		return 7
+	fi
 }
 
 sync_code() {
