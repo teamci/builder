@@ -19,19 +19,6 @@ setup() {
 	[ -n "${output}" ]
 }
 
-@test "rubocop: run after cloning target code" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
-}
-
 @test "rubocop: invalid repo fails" {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
@@ -65,21 +52,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-}
-
-@test "rubocop: second test run with config file" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'rubocop/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'with_config'
-	buildkite-agent meta-data set 'teamci.config.repo' 'rubocop/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'with_config'
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
-
-	run test/emulate-buildkite script/rubocop
-
-	[ $status -eq 0 ]
 }
 
 @test "rubocop: repo with RUBOCOP_OPTS" {

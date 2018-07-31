@@ -59,3 +59,28 @@ setup() {
 
 	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
 }
+
+@test "precommand: second test run after cloning code" {
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+}
+
+@test "precommand: second test run with config repo" {
+	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
+	buildkite-agent meta-data set 'teamci.head_branch' 'config_file'
+	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
+	buildkite-agent meta-data set 'teamci.config.branch' 'config_file'
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+}
