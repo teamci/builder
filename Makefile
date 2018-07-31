@@ -13,6 +13,10 @@ $(ENV): docker-compose.yml $(DOCKER_IMAGE_FILES) test/fake_api/*
 test-pipeline:
 	docker run --rm -v $(CURDIR):/data -w /data ruby:2.5 ruby test/pipeline_test.rb
 
+.PHONY: test-compose
+test-compose:
+	docker run --rm -v $(CURDIR):/data -w /data ruby:2.5 ruby test/compose_test.rb
+
 .PHONY: test-lint
 test-lint:
 	@echo '~~~ Linting Tests'
@@ -35,7 +39,7 @@ test-acceptance: $(ENV)
 		bats $(FILE)
 
 .PHONY: test-ci
-test-ci: test-acceptance test-pipeline test-lint
+test-ci: test-acceptance test-pipeline test-compose test-lint
 
 tmp/buildkite-agent:
 	mkdir -p $@

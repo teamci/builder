@@ -3,9 +3,17 @@ version: '2'
 services:
   syntax:
     build: syntax
+    image: teamci/syntax:v0.1.0
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
 
   editorconfig:
     build: editorconfig
+    image: teamci/editorconfig:v0.1.0
+    environment:
+      TEAMCI_REPO_SLUG: ~
+      TEAMCI_COMMIT: ~
 
   rubocop:
     build: rubocop
