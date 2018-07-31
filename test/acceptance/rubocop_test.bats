@@ -17,8 +17,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }
 
 @test "rubocop: run after cloning target code" {
@@ -55,8 +53,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }
 
 @test "rubocop: repo with config file" {
@@ -69,8 +65,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }
 
 @test "rubocop: second test run with config file" {
@@ -101,6 +95,4 @@ setup() {
 
 	# Grep for debug output that should be triggred by --debug in RUBOCOP_OPTS
 	echo "${output}" | grep -qF 'Inheriting configuration'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.rubocop.title')" ]
 }

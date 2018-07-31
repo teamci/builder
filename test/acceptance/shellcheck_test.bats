@@ -19,8 +19,6 @@ setup() {
 	[ -n "${output}" ]
 
 	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 
 @test "shellcheck: invalid repo fails" {
@@ -42,8 +40,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 
 @test "shellcheck: finds files with shell shebang" {
@@ -57,8 +53,6 @@ setup() {
 
 	# Test all fixture files were found
 	echo "${output}" | grep -iqF 'found 8 file(s)'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 
 @test "shellcheck: skips when no matching files" {
@@ -72,8 +66,6 @@ setup() {
 
 	# Test all fixture files were found
 	echo "${output}" | grep -iqF 'found 0 file(s)'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 
 @test "shellcheck: SHELLCHECK_OPTS exists" {
@@ -87,8 +79,6 @@ setup() {
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }
 
 @test "shellcheck: ls-files exists" {
@@ -107,6 +97,4 @@ setup() {
 
 	# Test that ls-files found 1 out of 2 files in the fixture repo
 	echo "${output}" | grep -iqF 'found 1 file(s)'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.shellcheck.title')" ]
 }

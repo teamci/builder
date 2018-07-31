@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'gometalinter - Aggregate multiple go linters'
-
 docker-compose run \
 	--rm \
 	-v "${CODE_DIR}:/code" \

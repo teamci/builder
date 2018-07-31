@@ -17,8 +17,6 @@ setup() {
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.gometalinter.title')" ]
 }
 
 @test "gometalinter: invalid repo fails" {
@@ -40,8 +38,6 @@ setup() {
 	echo "${output}" | grep -qF 'warning_level:'
 	echo "${output}" | grep -qF 'message:'
 	echo "${output}" | grep -qF 'title:'
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.gometalinter.title')" ]
 }
 
 @test "gometalinter: skips when no matching files" {
@@ -54,8 +50,6 @@ setup() {
 	# file list.
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.gometalinter.title')" ]
 }
 
 @test "gometalinter: config file exists" {
@@ -69,6 +63,4 @@ setup() {
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.gometalinter.title')" ]
 }

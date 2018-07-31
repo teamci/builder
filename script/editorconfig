@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" '.editorconfig covers files in source control'
-
 declare scratch
 
 echo '~~~ Generating file list'

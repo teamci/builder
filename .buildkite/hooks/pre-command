@@ -99,6 +99,14 @@ docker_pull() {
 	docker-compose pull "${BUILDKITE_LABEL}"
 }
 
+set_title() {
+	echo '~~~~ Setting title'
+
+	buildkite-agent meta-data set \
+		"teamci.${BUILDKITE_LABEL}.title" \
+		"$(jq -re ".${BUILDKITE_LABEL}" titles.json)"
+}
+
 check_whitelist() {
 	echo '~~~ Checking whitelist'
 
@@ -114,6 +122,8 @@ if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	get_access_token
 	sync_code
 	sync_config
+
+	set_title
 	check_whitelist
 
 	if [ -n "${CI:-}" ]; then

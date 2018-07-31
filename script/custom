@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-buildkite-agent meta-data set "teamci.${BUILDKITE_LABEL}.title" 'Custom checks'
-
 if [ ! -f "${CONFIG_DIR}/custom/Dockerfile" ]; then
 	echo "No Dockerfile found; skipping"
 	exit 7

@@ -1,0 +1,11 @@
+{
+  "credo": "Elixir code linting",
+  "custom": "Custom check",
+  "editorconfig": "All files covered by .editorconfig",
+  "eslint": "JavaScript/JSON linting",
+  "gometalinter": "Aggregate multiple go linters",
+  "phpcs": "PHP linting",
+  "syntax": "Static Configuration File Syntax Check",
+  "shellcheck": "Static analysis for shell programs",
+  "stylelint": "CSS/SCSS/LESS linting"
+}
