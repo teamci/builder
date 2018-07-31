@@ -1,3 +1,5 @@
+env:
+  BUILDKITE_TIMEOUT: "15"
 steps:
   - label: syntax
     command: script/syntax

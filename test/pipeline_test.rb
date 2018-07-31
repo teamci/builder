@@ -12,6 +12,10 @@ class PipelineTest < MiniTest::Test
     @pipeline = YAML.safe_load(File.new(PIPELINE_FILE))
   end
 
+  def test_timeout
+    assert pipeline.dig('env', 'BUILDKITE_TIMEOUT'), 'timeout missing'
+  end
+
   def test_scripts
     pipeline.fetch('steps').each do |entry|
       command = entry.dig('command')
