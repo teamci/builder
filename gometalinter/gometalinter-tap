@@ -6,7 +6,7 @@ main() {
 	local output exit_code
 
 	local config_file=/config/gometalinter/config.json
-	local -a gometalinter_args=(--json)
+	local -a gometalinter_args=(--json --skip vendor)
 
 	echo '~~~ Software versions'
 	echo '$ gometalinter --version'
@@ -25,7 +25,7 @@ main() {
 
 	echo '~~~ Running gometalinter'
 	set +e
-	gometalinter "${gometalinter_args[@]}" > "${output}"
+	gometalinter "${gometalinter_args[@]}" ./... > "${output}"
 	exit_code=$?
 	set -e
 
