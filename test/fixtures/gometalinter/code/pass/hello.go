@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/teamci/builder/test/fixtures/gometalinter/code/pass/mypkg"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	fmt.Printf("Hello %s\n", mypkg.World())
 }
