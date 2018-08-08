@@ -23,11 +23,18 @@ main() {
 		gometalinter_args+=(--config "${config_file}")
 	fi
 
+	echo '~~~ Preparing code for $GOPATH'
+	mkdir -p "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}"
+	cp -vr . "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}"
+	pushd "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}" > /dev/null
+
 	echo '~~~ Running gometalinter'
 	set +e
 	gometalinter "${gometalinter_args[@]}" ./... > "${output}"
 	exit_code=$?
 	set -e
+
+	popd > /dev/null
 
 	if [ "${exit_code}" -ne 0 ]; then
 		tapify.rb < "${output}"
