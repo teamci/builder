@@ -28,6 +28,12 @@ main() {
 	cp -vr . "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}"
 	pushd "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}" > /dev/null
 
+	echo '~~~~ Preparing dependencies'
+	if [ -x .teamci/gometalinter/deps ]; then
+		echo 'INFO: running provided deps install script'
+		.teamci/gometalinter/deps
+	fi
+
 	echo '~~~ Running gometalinter'
 	set +e
 	gometalinter "${gometalinter_args[@]}" ./... > "${output}"
