@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/teamci/builder/test/fixtures/gometalinter/code/pass/mypkg"
+	"github.com/gometalinter/code/mypkg"
 )
 
 func main() {

@@ -19,6 +19,17 @@ setup() {
 	[ -n "${output}" ]
 }
 
+@test "gometalinter: deps script provided" {
+	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
+	buildkite-agent meta-data set 'teamci.head_branch' 'deps'
+
+	run test/emulate-buildkite script/gometalinter
+
+	[ $status -eq 0 ]
+
+	echo "${output}" | grep -qF 'hello from deps script'
+}
+
 @test "gometalinter: invalid repo fails" {
 	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
 	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
