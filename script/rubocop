@@ -4,37 +4,9 @@ set -euo pipefail
 
 source .buildkite/hooks/pre-check
 
-echo '~~~ Software versions'
-
-echo '$ ruby --version'
-docker-compose run --rm rubocop ruby --version
-echo '$ rubocop --version'
-docker-compose run --rm rubocop rubocop --version
-
-echo '~~~ Preparing options'
-
-declare -a rubocop_args=(-f json --extra-details --display-style-guide)
-declare -a docker_args=(--rm)
-
-if [ -f "${CONFIG_DIR}/rubocop/config.yml" ]; then
-	echo "INFO: Using rubocop configuration file in config repo"
-	rubocop_args+=(--config /config/rubocop/config.yml)
-else
-	echo "INFO: No rubocop configuration file in config repo. Using rubocop defaults"
-fi
-
-if [ -f "${CONFIG_DIR}/rubocop/RUBOCOP_OPTS" ]; then
-	echo "INFO: Setting RUBOCOP_OPTS from file in config repo"
-	docker_args+=(-e "RUBOCOP_OPTS=$(cat "${CONFIG_DIR}/rubocop/RUBOCOP_OPTS")")
-else
-	echo "INFO: No RUBOCOP_OPTS file in config repo. Using default options."
-fi
-
-echo '~~~ Running rubocop'
-
 docker-compose run \
-	"${docker_args[@]}" \
+	--rm \
 	-v "${CODE_DIR}:/code" \
 	-v "${CONFIG_DIR}:/config" \
 	-w "/code" \
-	rubocop rubocop-tap "${rubocop_args[@]}"
+	rubocop 

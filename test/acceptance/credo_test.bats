@@ -1,50 +1,27 @@
-setup() {
-	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
-	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
-
-	# Required metadata, but scripts continue if these cannot be cloned
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'skip'
-
-	rm -rf "${TEAMCI_CODE_DIR}/"*
-}
+load test_helper
 
 @test "credo: invalid repo fails" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
+	use_code_fixture credo fail
 
 	run test/emulate-buildkite script/credo
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	# Test for annotation keys
-	echo "${output}" | grep -qF 'filename:'
-	echo "${output}" | grep -qF 'blob_href:'
-	echo "${output}" | grep -qF 'start_line:'
-	echo "${output}" | grep -qF 'end_line:'
-	echo "${output}" | grep -qF 'warning_level:'
-	echo "${output}" | grep -qF 'message:'
-	echo "${output}" | grep -qF 'title:'
+	assert_tap "${output}"
 }
 
 @test "credo: valid repo passes" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	use_code_fixture credo pass
 
 	run test/emulate-buildkite script/credo
 
 	[ $status -eq 0 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
+	refute_tap "${output}"
 }
 
 @test "credo: no matching files" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'skip'
+	use_code_fixture credo skip
 
 	run test/emulate-buildkite script/credo
 
@@ -53,10 +30,8 @@ setup() {
 }
 
 @test "credo: config file exists" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'config_file'
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'config_file'
+	use_code_fixture credo config_file
+	use_conf_fixture credo config_file
 
 	run test/emulate-buildkite script/credo
 
@@ -66,14 +41,58 @@ setup() {
 }
 
 @test "credo: config parse errors" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'parse_error'
+	use_code_fixture credo pass
+	use_conf_fixture credo parse_error
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 1 ]
+
+	refute_tap "${output}"
+}
+
+@test "credo: file list set" {
+	# Run against all files should fail
+	use_code_fixture credo file-list
 
 	run test/emulate-buildkite script/credo
 
 	[ $status -eq 1 ]
 	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 0 ]
+
+	assert_tap "${output}"
+
+	# Run without the failing file should pass
+	set_test_files lib/pass.ex lib/junk.txt
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+
+	refute_tap "${output}"
+}
+
+@test "credo: file list ignored by config" {
+	# Run with a invalid file excluded from config passes
+	use_code_fixture credo file-list-ignore
+	use_conf_fixture credo file-list-ignore
+
+	# fail/sample.ex is ignored by config, so run should pass
+	set_test_files lib/pass.ex fail/sample.ex lib/junk.txt
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 0 ]
+
+	refute_tap "${output}"
+}
+
+@test "credo: file list should be skipped" {
+	use_code_fixture credo file-list-skip
+
+	set_test_files junk.txt
+
+	run test/emulate-buildkite script/credo
+
+	[ $status -eq 7 ]
 }

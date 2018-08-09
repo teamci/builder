@@ -30,6 +30,9 @@ main() {
 			shift
 			metadata_command "$@"
 			;;
+		reset)
+			rm -f "${BUILDKITE_AGENT_METADIR}/"*
+			;;
 		*)
 			echo "Cannot handle $*" 1>&2
 			return 1

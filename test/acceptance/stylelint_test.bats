@@ -1,87 +1,103 @@
-setup() {
-	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
-	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
-
-	# Required metadata, but scripts continue if these cannot be cloned
-	buildkite-agent meta-data set 'teamci.config.repo' 'stylelint/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'skip'
-
-	rm -rf "${TEAMCI_CODE_DIR}/"*
-}
+load test_helper
 
 @test "stylelint: invalid repo fails" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'stylelint/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
+	use_code_fixture stylelint fail
 
 	run test/emulate-buildkite script/stylelint
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	# Test for annotation keys
-	echo "${output}" | grep -qF 'filename:'
-	echo "${output}" | grep -qF 'blob_href:'
-	echo "${output}" | grep -qF 'start_line:'
-	echo "${output}" | grep -qF 'end_line:'
-	echo "${output}" | grep -qF 'warning_level:'
-	echo "${output}" | grep -qF 'message:'
-	echo "${output}" | grep -qF 'title:'
+	assert_tap "${output}"
+	assert_annotations "${output}"
 }
 
 @test "stylelint: parse errors" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'stylelint/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'parse_error'
+	use_code_fixture stylelint parse_error
 
 	run test/emulate-buildkite script/stylelint
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	# Test for annotation keys
-	echo "${output}" | grep -qF 'filename:'
-	echo "${output}" | grep -qF 'blob_href:'
-	echo "${output}" | grep -qF 'start_line:'
-	echo "${output}" | grep -qF 'end_line:'
-	echo "${output}" | grep -qF 'warning_level:'
-	echo "${output}" | grep -qF 'message:'
-	echo "${output}" | grep -qF 'title:'
+	assert_tap "${output}"
+	assert_annotations "${output}"
 }
 
 @test "stylelint: valid repo passes" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'stylelint/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	use_code_fixture stylelint pass
 
 	run test/emulate-buildkite script/stylelint
 
 	[ $status -eq 0 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
+	assert_tap "${output}"
 }
 
 @test "stylelint: skips when no matching files" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'stylelint/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'skip'
+	use_code_fixture stylelint skip
 
 	run test/emulate-buildkite script/stylelint
 
 	[ $status -eq 7 ]
-	[ -n "${output}" ]
+
+	refute_tap "${output}"
 }
 
 @test "stylelint: config file exists" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'stylelint/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'config_file'
-	buildkite-agent meta-data set 'teamci.config.repo' 'stylelint/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'config_file'
+	use_code_fixture stylelint config_file
+	use_conf_fixture stylelint config_file
 
 	run test/emulate-buildkite script/stylelint
 
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
-	[ -n "${output}" ]
+
+	assert_tap "${output}"
+}
+
+@test "stylelint: file list set" {
+	use_code_fixture stylelint file-list
+
+	run test/emulate-buildkite script/stylelint
+
+	[ $status -eq 1 ]
+
+	# Test that css files pass through selection filter
+	set_test_files pass.css junk.txt
+
+	run test/emulate-buildkite script/stylelint
+
+	[ $status -eq 0 ]
+
+	# Test that scss files pass through selection filter
+	set_test_files pass.scss
+
+	run test/emulate-buildkite script/stylelint
+
+	[ $status -eq 0 ]
+
+	# Test that less files pass through selection filter
+	set_test_files pass.less
+
+	run test/emulate-buildkite script/stylelint
+
+	[ $status -eq 0 ]
+}
+
+@test "stylelint: file list includes an ignored file" {
+	use_code_fixture stylelint file-list-ignore
+
+	set_test_files pass.css ignore.css
+
+	run test/emulate-buildkite script/stylelint
+
+	[ $status -eq 0 ]
+}
+
+@test "stylelint: file list should be skipped" {
+	use_code_fixture stylelint file-list
+	set_test_files junk.txt
+
+	run test/emulate-buildkite script/stylelint
+
+	[ $status -eq 7 ]
 }

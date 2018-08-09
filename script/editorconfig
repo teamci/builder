@@ -5,13 +5,18 @@ set -euo pipefail
 source .buildkite/hooks/pre-check
 
 declare scratch
-
-echo '~~~ Generating file list'
 scratch="$(mktemp)"
 
-pushd "${CODE_DIR}" > /dev/null
-git ls-files > "${scratch}"
-popd > /dev/null
+echo '~~~ Generating file list'
+if [ -f "${CODE_DIR}/.teamci_test_files" ]; then
+	echo 'INFO: using specified file list'
+	tee "${scratch}" < "${CODE_DIR}/.teamci_test_files"
+else
+	echo 'INFO: using git ls-files'
+	pushd "${CODE_DIR}" > /dev/null
+	git ls-files > "${scratch}"
+	popd > /dev/null
+fi
 
 echo '~~~ Testing coverage'
 docker-compose run \

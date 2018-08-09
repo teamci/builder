@@ -1,10 +1,12 @@
 FROM golang:1.10-alpine
 
-RUN apk add --update ruby ruby-dev build-base bash git \
+RUN apk add --no-cache bash ruby \
+	&& apk add --no-cache --virtual .build-deps ruby-dev build-base git \
 	&& go get -u gopkg.in/alecthomas/gometalinter.v2 \
 	&& ln -sf $GOPATH/bin/gometalinter.v2 $GOPATH/bin/gometalinter \
-	&& gometalinter --install\
-	&& gem install json --no-ri --no-rdoc
+	&& gometalinter --install \
+	&& gem install json --no-ri --no-rdoc \
+	&& apk del .build-deps
 
 COPY tapify.rb gometalinter-tap /usr/bin/
 

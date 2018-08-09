@@ -1,0 +1,4 @@
+root = true
+
+[pass.rb]
+indent_style = tab

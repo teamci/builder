@@ -1,17 +1,7 @@
-setup() {
-	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
-	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
-
-	# Required metadata, but scripts continue if these cannot be cloned
-	buildkite-agent meta-data set 'teamci.config.repo' 'gometalinter/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'skip'
-
-	rm -rf "${TEAMCI_CODE_DIR}/"*
-}
+load test_helper
 
 @test "gometalinter: valid repo passes" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	use_code_fixture gometalinter pass
 
 	run test/emulate-buildkite script/gometalinter
 
@@ -20,8 +10,7 @@ setup() {
 }
 
 @test "gometalinter: deps script provided" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'deps'
+	use_code_fixture gometalinter deps
 
 	run test/emulate-buildkite script/gometalinter
 
@@ -31,29 +20,18 @@ setup() {
 }
 
 @test "gometalinter: invalid repo fails" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
+	use_code_fixture gometalinter fail
 
 	run test/emulate-buildkite script/gometalinter
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
-
-	# Test for annotation keys
-	echo "${output}" | grep -qF 'filename:'
-	echo "${output}" | grep -qF 'blob_href:'
-	echo "${output}" | grep -qF 'start_line:'
-	echo "${output}" | grep -qF 'end_line:'
-	echo "${output}" | grep -qF 'warning_level:'
-	echo "${output}" | grep -qF 'message:'
-	echo "${output}" | grep -qF 'title:'
+	assert_tap "${output}"
+	assert_annotations "${output}"
 }
 
 @test "gometalinter: skips when no matching files" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'skip'
+	use_code_fixture gometalinter skip
 
 	run test/emulate-buildkite script/gometalinter
 
@@ -64,14 +42,47 @@ setup() {
 }
 
 @test "gometalinter: config file exists" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'gometalinter/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'config-file'
-	buildkite-agent meta-data set 'teamci.config.repo' 'gometalinter/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'config-file'
+	use_code_fixture gometalinter config-file
+	use_conf_fixture gometalinter config-file
 
 	run test/emulate-buildkite script/gometalinter
 
 	# The configured options should make the failing fixture pass
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
+}
+
+@test "gometalinter: test commit files" {
+	use_code_fixture gometalinter file-list
+
+	set_test_files pass.go junk.txt
+
+	run test/emulate-buildkite script/gometalinter
+
+	# The configured options should make the failing fixture pass
+	[ $status -eq 0 ]
+	[ -n "${output}" ]
+}
+
+@test "gometalinter: test specific file ignored by config" {
+	use_code_fixture gometalinter file-list-exclude
+	use_conf_fixture gometalinter file-list-exclude
+
+	set_test_files ignore.go valid.go
+
+	run test/emulate-buildkite script/gometalinter
+
+	# The configured options should make the failing fixture pass
+	[ $status -eq 0 ]
+	[ -n "${output}" ]
+}
+
+@test "gometalinter: file list should be skipped" {
+	use_code_fixture gometalinter file-list-skip
+
+	set_test_files junk.txt
+
+	run test/emulate-buildkite script/gometalinter
+
+	[ $status -eq 7 ]
 }

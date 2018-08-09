@@ -3,12 +3,13 @@
 set -euo pipefail
 
 main() {
-	local output exit_code config_file
+	local output exit_code config_file allowed_pattern
 
 	output="$(mktemp)"
 	config_file=/config/credo/config.exs
+	allowed_pattern='\.ex$'
 
-	local -a args=("--format=flycheck")
+	local -a args=()
 
 	echo '~~~ Versions'
 	echo '$ elixir --version'
@@ -16,13 +17,31 @@ main() {
 	echo '$ mix credo --version'
 	mix credo --version
 
+	echo '~~~ Generating file list'
+	if [ -f ".teamci_test_files" ]; then
+		if grep -qE "${allowed_pattern}" .teamci_test_files; then
+			echo 'INFO: selecting files for credo'
+			while read -r file; do
+				args+=( "${file}" )
+			done < <(grep -E "${allowed_pattern}" .teamci_test_files)
+		else
+			echo 'INFO: no supported files included in list; skipping.'
+			return 7
+		fi
+	else
+		echo 'INFO: testing all files'
+	fi
+
+	echo '~~~ Preparing config'
 	if [ -f "${config_file}" ]; then
-		echo '~~~ Linking global config'
+		echo 'INFO: Linking global config'
 		mkdir -p config
 		cp "${config_file}" config/.credo.exs
 	else
-		echo '~~~ Using default config'
+		echo 'INFO: Using default config'
 	fi
+
+	args+=("--format=flycheck")
 
 	echo '~~~ Running credo list'
 	set +e

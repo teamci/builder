@@ -4,7 +4,8 @@ require 'minitest/autorun'
 require 'yaml'
 
 class PipelineTest < MiniTest::Test
-  COMPOSE_FILE = 'docker-compose.yml'.freeze
+  COMPOSE_FILE = 'docker-compose.yml'
+  TAGGED_IMAGE = %r{^teamci/\w+:v\d\.\d.\d$}
 
   attr_reader :services
 
@@ -19,16 +20,20 @@ class PipelineTest < MiniTest::Test
     services.each_pair do |name, data|
       assert data.dig('image'), "#{name} missing image"
 
-      assert_match %r{^teamci/\w+:v\d\.\d.\d$}, data.dig('image'), "#{name} image incorrect"
+      assert_match TAGGED_IMAGE, data.dig('image'), "#{name} image incorrect"
     end
   end
 
   def test_check_environment
     services.each_pair do |name, data|
-      environment = data.fetch('environment')
+      env = data.fetch('environment')
 
-      assert_nil environment.fetch('TEAMCI_REPO_SLUG'), 'TEAMCI_REPO_SLUG not set'
-      assert_nil environment.fetch('TEAMCI_COMMIT'), 'TEAMCI_COMMIT not set'
+      assert_env 'TEAMCI_REPO_SLUG', env, name
+      assert_env 'TEAMCI_COMMIT', env, name
     end
+  end
+
+  def assert_env(key, data, name)
+    assert_nil data.fetch(key), "#{name} missing #{key}"
   end
 end

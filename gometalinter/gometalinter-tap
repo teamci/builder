@@ -6,7 +6,8 @@ main() {
 	local output exit_code
 
 	local config_file=/config/gometalinter/config.json
-	local -a gometalinter_args=(--json --skip vendor)
+	local -a args=(--json --skip vendor)
+	local allowed_pattern="\.go$"
 
 	echo '~~~ Software versions'
 	echo '$ gometalinter --version'
@@ -14,29 +15,48 @@ main() {
 
 	output="$(mktemp)"
 
-	echo '~~~ Checking configuration'
+	echo '~~~ Preparing configuration options'
 
 	if [ ! -f "${config_file}" ]; then
 		echo 'INFO: no configuration file. Using defaults'.
 	else
 		echo 'INFO: found configuration file'
-		gometalinter_args+=(--config "${config_file}")
+		args+=(--config "${config_file}")
 	fi
 
-	echo '~~~ Preparing code for $GOPATH'
+	echo '~~~ Preparing file list'
+
+	if [ -f ".teamci_test_files" ]; then
+		if grep -qE "${allowed_pattern}" .teamci_test_files; then
+			echo 'INFO: selecting files for gotmetalinter'
+			while read -r file; do
+				args+=( "${file}" )
+			done < <(grep -E "${allowed_pattern}" .teamci_test_files)
+		else
+			echo 'INFO: no testable files found in list; skipping'
+			return 7
+		fi
+	else
+		echo 'INFO: using recursive glob ./...'
+		args+=( "./..." )
+	fi
+
+	echo '~~~ Preparing code for GOPATH'
 	mkdir -p "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}"
-	cp -vr . "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}"
+	cp -r . "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}"
 	pushd "${GOPATH}/src/github.com/${TEAMCI_REPO_SLUG}" > /dev/null
 
-	echo '~~~~ Preparing dependencies'
+	echo '~~~ Preparing dependencies'
 	if [ -x .teamci/gometalinter/deps ]; then
 		echo 'INFO: running provided deps install script'
 		.teamci/gometalinter/deps
+	else
+		echo 'WARN: no deps script provided; linters may fail do to missing dependencies'
 	fi
 
 	echo '~~~ Running gometalinter'
 	set +e
-	gometalinter "${gometalinter_args[@]}" ./... > "${output}"
+	gometalinter "${args[@]}" > "${output}"
 	exit_code=$?
 	set -e
 

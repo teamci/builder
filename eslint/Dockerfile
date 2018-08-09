@@ -1,7 +1,10 @@
-FROM ubuntu:18.04
+FROM node:7-alpine
 
-RUN apt-get update && apt-get install -y ruby npm
-RUN npm install -g eslint
+RUN apk add --no-cache bash ruby \
+	&& apk add --no-cache --virtual .build-deps ruby-dev build-base \
+	&& npm install -g eslint@4.19.1 \
+	&& gem install json --no-ri --no-rdoc \
+	&& apk del .build-deps
 
 ADD tapify.rb eslint-tap /usr/local/bin/
 

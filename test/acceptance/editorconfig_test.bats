@@ -1,53 +1,37 @@
-setup() {
-	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
-	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
-
-	# Required metadata, but scripts continue if these cannot be cloned
-	buildkite-agent meta-data set 'teamci.config.repo' 'no-op/no-op'
-	buildkite-agent meta-data set 'teamci.config.branch' 'master'
-
-	rm -rf "${TEAMCI_CODE_DIR}/"*
-}
+load test_helper
 
 @test "editorconfig: valid repo passes" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'editorconfig/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	use_code_fixture editorconfig pass
 
 	run test/emulate-buildkite script/editorconfig
 
 	[ $status -eq 0 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
+	assert_tap "${output}"
 }
 
 @test "editorconfig: problematic git files" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'editorconfig/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'ignore_files'
+	use_code_fixture editorconfig ignore_files
 
 	run test/emulate-buildkite script/editorconfig
 
 	[ $status -eq 0 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
+	assert_tap "${output}"
 }
 
 @test "editorconfig: invalid repo fails" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'editorconfig/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'fail'
+	use_code_fixture editorconfig fail
 
 	run test/emulate-buildkite script/editorconfig
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
 
-	[ "$(echo "${output}" | grep -cF -- '--- TAP')" -eq 2 ]
+	assert_tap "${output}"
 }
 
 @test "editorconfig: no .editorconfig" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'editorconfig/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'skip'
+	use_code_fixture editorconfig skip
 
 	run test/emulate-buildkite script/editorconfig
 
@@ -56,4 +40,32 @@ setup() {
 
 	# Test that ls-files found 1 out of 2 files in the fixture repo
 	echo "${output}" | grep -iqF 'skip'
+}
+
+@test "editorconfig: file list set" {
+	use_code_fixture editorconfig file-list
+
+	run test/emulate-buildkite script/editorconfig
+
+	[ $status -eq 1 ];
+
+	assert_tap "${output}"
+
+	set_test_files pass.rb
+
+	run test/emulate-buildkite script/editorconfig
+
+	[ $status -eq 0 ];
+
+	assert_tap "${output}"
+}
+
+@test "editorconfig: file list includes an ignored file" {
+	use_code_fixture editorconfig file-list-ignore
+
+	set_test_files pass.rb skip.rb
+
+	run test/emulate-buildkite script/editorconfig
+
+	[ $status -eq 0 ];
 }

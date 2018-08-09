@@ -5,7 +5,7 @@ set -euo pipefail
 source .buildkite/hooks/pre-check
 
 declare -a docker_opts=(--rm)
-declare scratch
+declare scratch possible_files
 
 echo '~~~ Software versions'
 echo '$ shellcheck --version'
@@ -24,6 +24,7 @@ fi
 echo '~~~ Generating file list'
 declare total_files
 scratch="$(mktemp)"
+possible_files="$(mktemp)"
 
 if [ -x "${CONFIG_DIR}/shellcheck/ls-files" ]; then
 	echo "INFO: generating files using ls-files"
@@ -32,7 +33,15 @@ if [ -x "${CONFIG_DIR}/shellcheck/ls-files" ]; then
 	"${CONFIG_DIR}/shellcheck/ls-files" > "${scratch}"
 	popd > /dev/null
 else
-	echo "INFO: no ls-files script; finding files from git ls-files"
+	if [ -f "${CODE_DIR}/.teamci_test_files" ]; then
+		echo "INFO: selecting from list of test files"
+		cat "${CODE_DIR}/.teamci_test_files" > "${possible_files}"
+	else
+		echo "INFO: finding files from git ls-files"
+		pushd "${CODE_DIR}" > /dev/null
+		git ls-files > "${possible_files}"
+		popd > /dev/null
+	fi
 
 	declare shebang
 	pushd "${CODE_DIR}" > /dev/null
@@ -67,7 +76,7 @@ else
 					;;
 			esac
 		fi
-	done < <(git ls-files)
+	done < "${possible_files}"
 	popd > /dev/null
 fi
 

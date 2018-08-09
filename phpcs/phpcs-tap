@@ -7,6 +7,7 @@ main() {
 
 	output="$(mktemp)"
 	config_file=/config/phpcs/ruleset.xml
+	php_pattern="\.php$"
 
 	local -a args=("--report=json" "--report-file=${output}")
 
@@ -14,7 +15,7 @@ main() {
 	echo '$ phpcs --version'
 	phpcs --version
 
-	echo '~~~ Checking configuration'
+	echo '~~~ Preparing configuration options'
 	if [ -f "${config_file}" ]; then
 		echo 'INFO: using custom ruleset.xml'
 		args+=("--standard=${config_file}")
@@ -22,9 +23,26 @@ main() {
 		echo 'INFO: no custom ruleset.xml found; using defaults.'
 	fi
 
+	echo '~~~ Generating file list'
+
+	if [ -f ".teamci_test_files" ]; then
+		if grep -qE "${php_pattern}" .teamci_test_files; then
+			echo 'INFO: selecting files for phpcs'
+			while read -r file; do
+				args+=( "${file}" )
+			done < <(grep -E "${php_pattern}" .teamci_test_files)
+		else
+			echo 'INFO: no testable files in list; skipping'
+			return 7
+		fi
+	else
+		echo 'INFO: testing all files'
+		args+=( "." )
+	fi
+
 	echo '~~~ Running phpcs'
 	set +e
-	phpcs "${args[@]}" .
+	phpcs "${args[@]}"
 	exit_code=$?
 	set -e
 
@@ -34,7 +52,7 @@ main() {
 	fi
 
 	if [ "$(jq -re '.files | length' "${output}")" -eq 0 ]; then
-		echo 'No files found, skipping'
+		echo 'INFO: No files found, skipping'
 		return 7
 	fi
 

@@ -1,60 +1,74 @@
-setup() {
-	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
-	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
-
-	rm -rf "${TEAMCI_CODE_DIR}/"*
-}
+load test_helper
 
 @test "syntax: valid repo passes" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
+	use_code_fixture syntax pass
 
 	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 0 ]
-	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
+
+	assert_tap "${output}"
 }
 
 @test "syntax: invalid json fails" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'invalid_json'
+	use_code_fixture syntax invalid_json
 
 	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
+
+	assert_tap "${output}"
 }
 
 @test "syntax: invalid yml fails" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'invalid_yml'
+	use_code_fixture syntax invalid_yml
 
 	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 1 ]
-	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
+
+	assert_tap "${output}"
 }
 
 @test "syntax: no files to syntax" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'skip'
+	use_code_fixture syntax skip
 
 	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 7 ]
-	[ -n "${output}" ]
-	[ "$(echo "${output}" | grep -c -F -- '--- TAP')" -eq 2 ]
+
+	assert_tap "${output}"
 }
 
 @test "syntax: ls-files script present" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'syntax/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'config_script'
+	use_code_fixture syntax config_script
 
 	run test/emulate-buildkite script/syntax
 
 	[ $status -eq 0 ]
 	[ -n "${output}" ]
+}
+
+@test "syntax: file list set" {
+	use_code_fixture syntax file-list
+
+	run test/emulate-buildkite script/syntax
+
+	[ $status -eq 1 ]
+
+	set_test_files valid.json
+
+	run test/emulate-buildkite script/syntax
+
+	[ $status -eq 0 ]
+}
+
+@test "syntax: file list should be skipped" {
+	use_code_fixture syntax file-list
+
+	set_test_files junk.txt
+
+	run test/emulate-buildkite script/syntax
+
+	[ $status -eq 7 ]
 }

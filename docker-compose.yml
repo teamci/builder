@@ -3,63 +3,63 @@ version: '2'
 services:
   syntax:
     build: syntax
-    image: teamci/syntax:v0.1.0
+    image: teamci/syntax:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   editorconfig:
     build: editorconfig
-    image: teamci/editorconfig:v0.1.0
+    image: teamci/editorconfig:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   rubocop:
     build: rubocop
-    image: teamci/rubocop:v0.1.0
+    image: teamci/rubocop:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   shellcheck:
     build: shellcheck
-    image: teamci/shellcheck:v0.1.0
+    image: teamci/shellcheck:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   eslint:
     build: eslint
-    image: teamci/eslint:v0.1.0
+    image: teamci/eslint:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   gometalinter:
     build: gometalinter
-    image: teamci/gometalinter:v0.1.2
+    image: teamci/gometalinter:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   phpcs:
     build: phpcs
-    image: teamci/phpcs:v0.1.0
+    image: teamci/phpcs:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   stylelint:
     build: stylelint
-    image: teamci/stylelint:v0.1.0
+    image: teamci/stylelint:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~
 
   credo:
     build: credo
-    image: teamci/credo:v0.1.1
+    image: teamci/credo:v0.2.0
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~

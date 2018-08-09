@@ -52,6 +52,7 @@ sync_code() {
 	echo '~~~ :git: Checking out'
 
 	if git fetch -v --prune origin "${head_branch}" && git checkout -f "${head_sha}"; then
+		git clean -fdx
 		echo "INFO: code ${head_branch} @ ${head_sha} ready"
 		popd > /dev/null
 	else
@@ -105,6 +106,20 @@ sync_config() {
 	fi
 }
 
+generate_file_list() {
+	echo "~~~ :git: Generate list of test files"
+
+	if buildkite-agent meta-data get 'teamci.check_suite.files' | jq -re '.[]' &> /dev/null; then
+		buildkite-agent meta-data get 'teamci.check_suite.files' \
+			| jq -re '.[]' > "${CODE_DIR}/.teamci_test_files"
+		echo "INFO: Found list of possible files"
+
+		cat "${CODE_DIR}/.teamci_test_files"
+	else
+		echo 'INFO: No file list specified. Testing all files.'
+	fi
+}
+
 docker_pull() {
 	if [ "${BUILDKITE_LABEL}" = 'custom' ]; then
 		# skip this; no docker-compose entry
@@ -138,6 +153,7 @@ if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	get_access_token
 	sync_code
 	sync_config
+	generate_file_list
 
 	set_title
 	check_whitelist

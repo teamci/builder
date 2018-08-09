@@ -1,6 +1,8 @@
-FROM ubuntu:17.10
+FROM koalaman/shellcheck-alpine:v0.5.0
 
-RUN apt-get update && apt-get install -y \
-	shellcheck ruby
+RUN apk add --no-cache bash ruby \
+	&& apk add --no-cache --virtual .build-deps ruby-dev gcc make libc-dev \
+	&& gem install json --no-ri --no-rdoc \
+	&& apk del .build-deps
 
 COPY tapify.rb shellcheck-tap /usr/local/bin/

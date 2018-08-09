@@ -7,6 +7,7 @@ main() {
 
 	local config_file=/config/eslint/eslintrc.json
 	local ignore_file=/config/eslint/eslintignore
+	local allowed_pattern='\.js$'
 
 	output="$(mktemp)"
 
@@ -21,16 +22,34 @@ main() {
 		return 7
 	fi
 
-	local -a eslint_args=(-c "${config_file}" -f json --output-file "${output}")
+	echo '~~~ Preparing configuration'
+
+	local -a args=(-c "${config_file}" -f json --output-file "${output}")
 
 	if [ -f "${ignore_file}" ]; then
 		echo 'INFO: found ignore configuration file'
-		eslint_args+=(--ignore-path "${ignore_file}")
+		args+=(--ignore-path "${ignore_file}")
+	fi
+
+	echo '~~~ Preparing file list'
+	if [ -f ".teamci_test_files" ]; then
+		if grep -qE "${allowed_pattern}" .teamci_test_files; then
+			echo 'INFO: selecting files for eslint'
+			while read -r file; do
+				args+=( "${file}" )
+			done < <(grep -E "${allowed_pattern}" .teamci_test_files)
+		else
+			echo 'INFO: no supported files included in list; skipping'
+			return 7
+		fi
+	else
+		echo 'INFO: test files in the current directory'
+		args+=( "." )
 	fi
 
 	echo '~~~ Running eslint'
 	set +e
-	eslint "${eslint_args[@]}" .
+	eslint "${args[@]}"
 	exit_code=$?
 	set -e
 

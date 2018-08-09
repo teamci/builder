@@ -14,6 +14,9 @@ pushd "${CODE_DIR}" > /dev/null
 if [ -x ".teamci/syntax/ls-files" ]; then
 	echo 'INFO: Using file list from .teamci/syntax/ls-files'
 	.teamci/syntax/ls-files > "${scratch}"
+elif [ -f ".teamci_test_files" ]; then
+	echo 'INFO: Using file list'
+	cat .teamci_test_files > "${scratch}"
 else
 	echo 'INFO: Using file list from git ls-files'
 	git ls-files > "${scratch}"

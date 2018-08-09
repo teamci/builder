@@ -6,8 +6,48 @@ main() {
 	local output exit_code
 	output="$(mktemp)"
 
+	local -a args=(-f json --out "${output}" --extra-details --display-style-guide)
+	local ruby_pattern="\.rb$"
+
+	echo '~~~ Software versions'
+	echo '$ ruby --version'
+	ruby --version
+	echo '$ rubocop --version'
+	rubocop --version
+
+	echo '~~~ Preparing configuration'
+	if [ -f "/config/rubocop/config.yml" ]; then
+		echo "INFO: Using rubocop configuration file in config repo"
+		args+=(--config /config/rubocop/config.yml)
+	else
+		echo "INFO: No rubocop configuration file in config repo. Using rubocop defaults"
+	fi
+
+	if [ -f "/config/rubocop/RUBOCOP_OPTS" ]; then
+		echo "INFO: Setting RUBOCOP_OPTS from file in config repo"
+		export "RUBOCOP_OPTS=$(cat "/config/rubocop/RUBOCOP_OPTS")"
+	else
+		echo "INFO: No RUBOCOP_OPTS file in config repo. Using default options."
+	fi
+
+	echo '~~~ Generating file list'
+	if [ -f ".teamci_test_files" ]; then
+		if grep -qE "${ruby_pattern}" .teamci_test_files; then
+			echo 'INFO: selecting files for Rubucop'
+			while read -r file; do
+				args+=( "${file}" )
+			done < <(grep -E "${ruby_pattern}" .teamci_test_files)
+		else
+			echo 'INFO: no testable files found in list; skipping'
+			return 7
+		fi
+	else
+		echo 'INFO: testing all files'
+	fi
+
+	echo '~~~ Running rubocop'
 	set +e
-	rubocop "$@" --out "${output}"
+	rubocop "${args[@]}"
 	exit_code=$?
 	set -e
 

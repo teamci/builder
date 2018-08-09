@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 $stdout.sync = true
 $stderr.sync = true
@@ -25,7 +26,12 @@ def end_line(msg)
   msg.key?('endLine') ? msg.fetch('endLine') : msg.fetch('line')
 end
 
-report = JSON.parse($stdin.read)
+# Reject warnings about explicit files matching ignore rules
+report = JSON.parse($stdin.read).reject do |entry|
+  entry.fetch('messages').any? do |data|
+    data.fetch('message').include?('--no-ignore')
+  end
+end
 
 $stdout.puts('--- TAP')
 $stdout.puts("1..#{report.size}")

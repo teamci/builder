@@ -7,10 +7,11 @@ main() {
 
 	output="$(mktemp)"
 	config_file=/config/stylelint/config.json
+	stylelint_pattern="\.(css|scss|less|sss)$"
 
 	local -a args=("--formatter" "json" "--ignore-pattern" "**/*.min.css")
 
-	echo '~~~ Checking configuration'
+	echo '~~~ Building configuration options'
 	if [ -f "${config_file}" ]; then
 		echo 'INFO: using custom config.json'
 		args+=("--config" "../${config_file}")
@@ -19,9 +20,25 @@ main() {
 		args+=("--config" "../defaults/config.json")
 	fi
 
+	echo '~~~ Generating file list'
+	if [ -f ".teamci_test_files" ]; then
+		if grep -qE "${stylelint_pattern}" .teamci_test_files; then
+			echo 'INFO: selecting files for stylelint'
+			while read -r file; do
+				args+=( "${file}" )
+			done < <(grep -E "${stylelint_pattern}" .teamci_test_files)
+		else
+			echo 'INFO: no testable files in list; skipping'
+			return 7
+		fi
+	else
+		echo 'INFO: testing all possible files'
+		args+=( "**/*.{css,scss,less,sss}"  )
+	fi
+
 	echo '~~~ Running stylelint'
 	set +e
-	stylelint "${args[@]}" "**/*.{css,scss,less,sss}" > "${output}"
+	stylelint "${args[@]}" > "${output}"
 	exit_code=$?
 	set -e
 

@@ -1,17 +1,4 @@
-setup() {
-	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}"
-	buildkite-agent meta-data set 'teamci.head_sha' 'HEAD'
-
-	# Use a passing fixture
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-
-	# Required metadata, but scripts continue if these cannot be cloned
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'skip'
-
-	rm -rf "${TEAMCI_CODE_DIR}/"*
-}
+load test_helper
 
 @test "precommand: token request failure" {
 	buildkite-agent meta-data set 'teamci.access_token_url' "${TEAMCI_API_URL}?fail=true"
@@ -25,6 +12,7 @@ setup() {
 }
 
 @test "precommand: upstream branch non-existent" {
+	use_code_fixture credo pass
 	buildkite-agent meta-data set 'teamci.head_branch' 'deleted-upstream'
 
 	run test/emulate-buildkite script/credo
@@ -37,8 +25,8 @@ setup() {
 }
 
 @test "precommand: blacklisted" {
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'blacklist'
+	use_code_fixture credo pass
+	use_conf_fixture credo blacklist
 
 	run test/emulate-buildkite script/credo
 
@@ -49,8 +37,8 @@ setup() {
 }
 
 @test "precommand: whitelisted" {
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'whitelist'
+	use_code_fixture credo pass
+	use_conf_fixture credo whitelist
 
 	run test/emulate-buildkite script/credo
 
@@ -61,6 +49,8 @@ setup() {
 }
 
 @test "precommand: second test run after cloning code" {
+	use_code_fixture credo pass
+
 	run test/emulate-buildkite script/credo
 
 	[ $status -eq 0 ]
@@ -71,10 +61,8 @@ setup() {
 }
 
 @test "precommand: second test run with config repo" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'credo/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'config_file'
-	buildkite-agent meta-data set 'teamci.config.repo' 'credo/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'config_file'
+	use_code_fixture credo config_file
+	use_conf_fixture credo config_file
 
 	run test/emulate-buildkite script/credo
 
@@ -86,10 +74,8 @@ setup() {
 }
 
 @test "precommand: [REGRESSION] custom image pull on CI" {
-	buildkite-agent meta-data set 'teamci.repo.slug' 'custom/code'
-	buildkite-agent meta-data set 'teamci.head_branch' 'pass'
-	buildkite-agent meta-data set 'teamci.config.repo' 'custom/config'
-	buildkite-agent meta-data set 'teamci.config.branch' 'pass'
+	use_code_fixture custom pass
+	use_conf_fixture custom pass
 
 	export CI=true
 	run test/emulate-buildkite script/custom
