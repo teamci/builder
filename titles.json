@@ -5,6 +5,7 @@
   "eslint": "JavaScript/JSON linting",
   "gometalinter": "Aggregate multiple go linters",
   "phpcs": "PHP linting",
+  "rubocop": "Ruby static analysis",
   "syntax": "Static Configuration File Syntax Check",
   "shellcheck": "Static analysis for shell programs",
   "stylelint": "CSS/SCSS/LESS linting"
