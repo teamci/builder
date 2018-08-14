@@ -41,7 +41,7 @@ main() {
 			echo 'INFO: selecting files for gotmetalinter'
 			while read -r file; do
 				args+=( "${file}" )
-			done < <(grep -E "${allowed_pattern}" .teamci_test_files)
+			done < <(grep -E "${allowed_pattern}" .teamci_test_files | xargs dirname | sort -u)
 		else
 			echo 'INFO: no testable files found in list; skipping'
 			return 7
@@ -65,6 +65,8 @@ main() {
 	fi
 
 	echo '~~~ Running gometalinter'
+	echo "$ gometalinter ${args[*]}"
+
 	set +e
 	gometalinter "${args[@]}" > "${output}"
 	exit_code=$?

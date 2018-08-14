@@ -38,7 +38,7 @@ services:
 
   gometalinter:
     build: gometalinter
-    image: teamci/gometalinter:v0.2.1
+    image: teamci/gometalinter:v0.2.2
     environment:
       TEAMCI_REPO_SLUG: ~
       TEAMCI_COMMIT: ~

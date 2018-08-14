@@ -52,18 +52,6 @@ load test_helper
 	[ -n "${output}" ]
 }
 
-@test "gometalinter: test commit files" {
-	use_code_fixture gometalinter file-list
-
-	set_test_files pass.go junk.txt
-
-	run test/emulate-buildkite script/gometalinter
-
-	# The configured options should make the failing fixture pass
-	[ $status -eq 0 ]
-	[ -n "${output}" ]
-}
-
 @test "gometalinter: test specific file ignored by config" {
 	use_code_fixture gometalinter file-list-exclude
 	use_conf_fixture gometalinter file-list-exclude
@@ -85,4 +73,15 @@ load test_helper
 	run test/emulate-buildkite script/gometalinter
 
 	[ $status -eq 7 ]
+}
+
+@test "gometalinter: test commit files package" {
+	use_code_fixture gometalinter pass
+
+	set_test_files mypkg/mypkg.go
+
+	run test/emulate-buildkite script/gometalinter
+
+	[ $status -eq 0 ]
+	[ -n "${output}" ]
 }
