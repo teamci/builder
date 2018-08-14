@@ -4,11 +4,11 @@ import "os/user"
 
 // World returns a string World.
 func World() string {
-	user, err := user.Current();
+	user, err := user.Current()
 
 	if err != nil {
-		return "Could not get current user!"
+		return ErrWorld("Could not get current user!").Error()
 	}
 
-	return user.Username;
+	return user.Username
 }
