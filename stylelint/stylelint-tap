@@ -7,7 +7,7 @@ main() {
 
 	output="$(mktemp)"
 	config_file=/config/stylelint/config.json
-	stylelint_pattern="\.(css|scss|less|sss)$"
+	stylelint_pattern='\.(css|scss|less|sss)$'
 
 	local -a args=("--formatter" "json" "--ignore-pattern" "**/*.min.css")
 

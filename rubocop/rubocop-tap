@@ -7,7 +7,7 @@ main() {
 	output="$(mktemp)"
 
 	local -a args=(-f json --out "${output}" --extra-details --display-style-guide)
-	local ruby_pattern="\.rb$"
+	local ruby_pattern='\.rb$'
 
 	echo '~~~ Software versions'
 	echo '$ ruby --version'

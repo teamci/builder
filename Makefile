@@ -24,6 +24,7 @@ test-lint:
 		$(wildcard script/*) \
 		$(wildcard .buildkite/hooks/*) \
 		$(wildcard test/stubs/bin/*) \
+		$(shell find . -name '*-tap' -print) \
 		test/emulate-buildkite
 
 .PHONY: test-acceptance

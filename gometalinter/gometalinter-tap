@@ -2,16 +2,26 @@
 
 set -euo pipefail
 
+run_command() {
+	echo "$ $*"
+	# shellcheck disable=SC2068
+	$@
+}
+
 main() {
 	local output exit_code
 
 	local config_file=/config/gometalinter/config.json
 	local -a args=(--json --skip vendor)
-	local allowed_pattern="\.go$"
+	local allowed_pattern='\.go$'
 
 	echo '~~~ Software versions'
-	echo '$ gometalinter --version'
-	gometalinter --version
+	run_command go version
+	run_command gometalinter --version
+	run_command git --version
+	run_command hg --version
+	run_command bzr --version
+	run_command svn --version
 
 	output="$(mktemp)"
 

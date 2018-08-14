@@ -7,7 +7,7 @@ main() {
 
 	output="$(mktemp)"
 	config_file=/config/phpcs/ruleset.xml
-	php_pattern="\.php$"
+	php_pattern='\.php$'
 
 	local -a args=("--report=json" "--report-file=${output}")
 
