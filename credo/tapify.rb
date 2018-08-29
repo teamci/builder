@@ -9,15 +9,7 @@ require 'yaml'
 
 FORMAT = /^(?<file>[^:]+):(?<line>\d+):\d+:\d*\s(?<level>[A-Z]):\s(?<msg>.+)$/
 
-def blob_url(file_name)
-  format('https://github.com/%<slug>s/blob/%<commit>s/%<file>s', {
-    slug: ENV.fetch('TEAMCI_REPO_SLUG'),
-    commit: ENV.fetch('TEAMCI_COMMIT'),
-    file: file_name
-  })
-end
-
-def warning_level(level)
+def annotation_level(level)
   case level.downcase
   when 'w' then 'failure'
   else 'warning'
@@ -40,11 +32,10 @@ report.each_with_index do |data, i|
   $stdout.puts("not ok #{i + 1} - #{file_name}")
 
   annotation = {
-    'filename' => file_name,
-    'blob_href' => blob_url(file_name),
+    'path' => file_name,
     'start_line' => result[:line].to_i,
     'end_line' => result[:line].to_i,
-    'warning_level' => warning_level(result[:level]),
+    'annotation_level' => annotation_level(result[:level]),
     'message' => result[:msg],
     'title' => 'Credo check failed'
   }

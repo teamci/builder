@@ -7,15 +7,7 @@ $stderr.sync = true
 require 'json'
 require 'yaml'
 
-def blob_url(file_name)
-  format('https://github.com/%<slug>s/blob/%<commit>s/%<file>s', {
-    slug: ENV.fetch('TEAMCI_REPO_SLUG'),
-    commit: ENV.fetch('TEAMCI_COMMIT'),
-    file: file_name
-  })
-end
-
-def warning_level(level)
+def annotation_level(level)
   case level
   when 'error' then 'failure'
   else 'warning'
@@ -33,11 +25,10 @@ report.each_with_index do |data, i|
 
   $stdout.puts("not ok #{i + 1} - #{path}")
   annotation = {
-    'filename' => path,
-    'blob_href' => blob_url(path),
+    'path' => path,
     'start_line' => data.fetch('line'),
     'end_line' => data.fetch('line'),
-    'warning_level' => warning_level(data.fetch('severity')),
+    'annotation_level' => annotation_level(data.fetch('severity')),
     'message' => message,
     'title' => "gometalinter: #{data.fetch('linter')}"
   }

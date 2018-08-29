@@ -64,11 +64,10 @@ assert_tap() {
 
 assert_annotations() {
 	# Test for annotation keys
-	echo "${1}" | grep -qF 'filename:'
-	echo "${1}" | grep -qF 'blob_href:'
+	echo "${1}" | grep -qF 'path:'
 	echo "${1}" | grep -qF 'start_line:'
 	echo "${1}" | grep -qF 'end_line:'
-	echo "${1}" | grep -qF 'warning_level:'
+	echo "${1}" | grep -qF 'annotation_level:'
 	echo "${1}" | grep -qF 'message:'
 	echo "${1}" | grep -qF 'title:'
 }
