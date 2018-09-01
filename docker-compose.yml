@@ -19,7 +19,7 @@ services:
 
   eslint:
     build: eslint
-    image: teamci/eslint:v0.2.1
+    image: teamci/eslint:v0.3.0
 
   gometalinter:
     build: gometalinter

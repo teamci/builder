@@ -7,7 +7,7 @@ main() {
 
 	local config_file=/config/eslint/eslintrc.json
 	local ignore_file=/config/eslint/eslintignore
-	local allowed_pattern='\.js$'
+	local allowed_pattern
 
 	output="$(mktemp)"
 
@@ -31,6 +31,16 @@ main() {
 	echo '~~~ Preparing configuration'
 
 	local -a args=(-c "${config_file}" -f json --output-file "${output}")
+
+	echo '~~~ Checking for vue plugin'
+	if jq -re '.plugins[]' "${config_file}" 2> /dev/null | grep -qF 'vue'; then
+		echo 'INFO: found vue plugin'
+		args+=( --ext .vue )
+		allowed_pattern='\.(js|vue)$'
+	else
+		echo 'INFO: vue plugin not found'
+		allowed_pattern='\.js'
+	fi
 
 	if [ -f "${ignore_file}" ]; then
 		echo 'INFO: found ignore configuration file'

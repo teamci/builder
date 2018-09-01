@@ -101,3 +101,66 @@ load test_helper
 	[ $status -eq 1 ]
 	! echo "${output}" | grep -qiF 'unexpected token'
 }
+
+@test "eslint: vue plugin enabled" {
+	use_code_fixture eslint vue
+	use_conf_fixture eslint vue
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+
+	set_test_files valid.vue
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 0 ]
+
+	set_test_files invalid.vue
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+}
+
+@test "eslint: react plugin enabled" {
+	use_code_fixture eslint react
+	use_conf_fixture eslint react
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+
+	set_test_files valid.js
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 0 ]
+
+	set_test_files invalid.js
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+}
+
+@test "eslint: ember plugin enabled" {
+	use_code_fixture eslint ember
+	use_conf_fixture eslint ember
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+
+	set_test_files valid.js
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 0 ]
+
+	set_test_files invalid.js
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+}
