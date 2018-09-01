@@ -24,15 +24,6 @@ class PipelineTest < MiniTest::Test
     end
   end
 
-  def test_check_environment
-    services.each_pair do |name, data|
-      env = data.fetch('environment')
-
-      assert_env 'TEAMCI_REPO_SLUG', env, name
-      assert_env 'TEAMCI_COMMIT', env, name
-    end
-  end
-
   def assert_env(key, data, name)
     assert_nil data.fetch(key), "#{name} missing #{key}"
   end
