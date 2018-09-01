@@ -22,6 +22,12 @@ main() {
 		return 7
 	fi
 
+	if ! jq -re '.' "${config_file}" 2> "${output}" > /dev/null; then
+		echo "ERROR: ${config_file} is not valid JSON"
+		cat "${output}"
+		return 1
+	fi
+
 	echo '~~~ Preparing configuration'
 
 	local -a args=(-c "${config_file}" -f json --output-file "${output}")

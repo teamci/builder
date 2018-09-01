@@ -15,6 +15,12 @@ main() {
 	if [ -f "${config_file}" ]; then
 		echo 'INFO: using custom config.json'
 		args+=("--config" "../${config_file}")
+
+		if ! jq -re '.' "${config_file}" 2> "${output}" > /dev/null; then
+			echo 'ERROR: custom config.json is not valid JSON'
+			cat "${output}"
+			return 1
+		fi
 	else
 		echo 'INFO: no custom config.json found; using standard config.'
 		args+=("--config" "../defaults/config.json")

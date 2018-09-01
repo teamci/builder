@@ -19,7 +19,7 @@ services:
 
   eslint:
     build: eslint
-    image: teamci/eslint:v0.2.0
+    image: teamci/eslint:v0.2.1
 
   gometalinter:
     build: gometalinter
@@ -33,7 +33,7 @@ services:
 
   stylelint:
     build: stylelint
-    image: teamci/stylelint:v0.2.0
+    image: teamci/stylelint:v0.2.1
 
   credo:
     build: credo

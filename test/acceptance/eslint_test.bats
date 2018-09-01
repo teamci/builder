@@ -91,3 +91,13 @@ load test_helper
 
 	[ $status -eq 7 ]
 }
+
+@test "eslint: invalid JSON configuration file" {
+	use_code_fixture eslint pass
+	use_conf_fixture eslint invalid-json
+
+	run test/emulate-buildkite script/eslint
+
+	[ $status -eq 1 ]
+	! echo "${output}" | grep -qiF 'unexpected token'
+}
