@@ -3,41 +3,41 @@ version: '2'
 services:
   syntax:
     build: syntax
-    image: teamci/syntax:v0.2.0
+    image: teamci/syntax:v0.2.1
 
   editorconfig:
     build: editorconfig
-    image: teamci/editorconfig:v0.2.0
+    image: teamci/editorconfig:v0.2.1
 
   rubocop:
     build: rubocop
-    image: teamci/rubocop:v0.2.0
+    image: teamci/rubocop:v0.2.1
 
   shellcheck:
     build: shellcheck
-    image: teamci/shellcheck:v0.2.0
+    image: teamci/shellcheck:v0.2.1
 
   eslint:
     build: eslint
-    image: teamci/eslint:v0.3.0
+    image: teamci/eslint:v0.3.1
 
   gometalinter:
     build: gometalinter
-    image: teamci/gometalinter:v0.2.2
+    image: teamci/gometalinter:v0.2.3
     environment:
       TEAMCI_REPO_SLUG: ~
 
   phpcs:
     build: phpcs
-    image: teamci/phpcs:v0.2.0
+    image: teamci/phpcs:v0.2.1
 
   stylelint:
     build: stylelint
-    image: teamci/stylelint:v0.2.1
+    image: teamci/stylelint:v0.2.2
 
   credo:
     build: credo
-    image: teamci/credo:v0.2.0
+    image: teamci/credo:v0.2.1
 
   api:
     build: test/fake_api
