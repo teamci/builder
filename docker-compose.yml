@@ -23,7 +23,7 @@ services:
 
   gometalinter:
     build: gometalinter
-    image: teamci/gometalinter:v0.2.3
+    image: teamci/gometalinter:v0.3.0
     environment:
       TEAMCI_REPO_SLUG: ~
 

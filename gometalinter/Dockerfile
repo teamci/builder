@@ -1,4 +1,4 @@
-FROM golang:1.10-alpine
+FROM golang:1.11-alpine
 
 RUN apk add --no-cache bash ruby git subversion mercurial bzr build-base \
 	&& apk add --no-cache --virtual .build-deps ruby-dev \
