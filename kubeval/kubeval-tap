@@ -18,6 +18,7 @@ main() {
 
 	echo '~~~ Software versions'
 	run_command kubeval --version
+	run_command ruby --version
 
 	echo '~~~ Finding manifest files'
 	if [ -f .teamci_test_files ]; then

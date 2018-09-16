@@ -20,14 +20,16 @@ def manifest?(data)
 end
 
 ARGV.each do |file|
-  case file
-  when /\.json$/
-    $stdout.puts(file) if manifest?(JSON.parse(File.read(file)))
-  when /\.ya?ml$/
-    $stdout.puts(file) if manifest?(YAML.safe_load(File.read(file)))
+  begin # rubocop:disable Style/RedundantBegin
+    case file
+    when /\.json$/
+      $stdout.puts(file) if manifest?(JSON.parse(File.read(file)))
+    when /\.ya?ml$/
+      $stdout.puts(file) if manifest?(YAML.safe_load(File.read(file)))
+    end
+  rescue JSON::ParserError, Psych::SyntaxError => ex
+    $stderr.puts("#{file} did not parse correctly: #{ex}")
+  rescue Pysch::DisallowedClass => ex
+    $stderr.puts("#{file} #{ex}. Try wrapping values in quotes.")
   end
-rescue JSON::ParserError, Psych::SyntaxError => ex
-  $stderr.puts("#{file} did not parse correctly: #{ex}")
-rescue Pysch::DisallowedClass => ex
-  $stderr.puts("#{file} #{ex}. Try wrapping values in quotes.")
 end

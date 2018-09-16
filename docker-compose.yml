@@ -41,7 +41,7 @@ services:
 
   kubeval:
     build: kubeval
-    image: teamci/kubeval:v0.1.0
+    image: teamci/kubeval:v0.1.1
 
   cfnlint:
     build: cfnlint
