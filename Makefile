@@ -1,6 +1,6 @@
 ENV:=tmp/env
 
-DOCKER_IMAGES:=syntax,rubocop,shellcheck,editorconfig,eslint,gometalinter,phpcs,stylelint,credo
+DOCKER_IMAGES:=syntax,rubocop,shellcheck,editorconfig,eslint,gometalinter,phpcs,stylelint,credo,kubeval,cfnlint
 DOCKER_IMAGE_FILES:=$(shell find {$(DOCKER_IMAGES)} -print)
 
 $(ENV): docker-compose.yml $(DOCKER_IMAGE_FILES) test/fake_api/*

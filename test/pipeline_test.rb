@@ -6,13 +6,13 @@ require 'json'
 
 class PipelineTest < MiniTest::Test
   PIPELINE_FILE = '.buildkite/pipeline.yml'
-  TITLES_FILE =  'titles.json'
+  TITLES_FILE = 'titles.json'
 
   attr_reader :pipeline, :titles
 
   def setup
     @pipeline = YAML.safe_load(File.new(PIPELINE_FILE))
-    @titles = JSON.load(File.new(TITLES_FILE))
+    @titles = JSON.parse(File.read(TITLES_FILE))
   end
 
   def test_timeout

@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+shopt -s globstar
+shopt -s nullglob
+
+run_command() {
+	echo "$ $*"
+	# shellcheck disable=SC2068
+	$@
+}
+
+main() {
+	local scratch output exit_code
+	scratch="$(mktemp)"
+	output="$(mktemp)"
+
+	echo '~~~ Software versions'
+	run_command cfn-lint --version
+
+	echo '~~~ Finding template files'
+	if [ -f .teamci_test_files ]; then
+		echo 'INFO: finding templates from file list'
+		xargs is-template.py < .teamci_test_files > "${scratch}"
+	elif [ -x /config/cfnlint/ls-files ]; then
+		echo 'INFO: finding templates from ls-files'
+		/config/cfnlint/ls-files > "${scratch}"
+	else
+		echo 'INFO: using default template lookup'
+		is-template.py ./**/*.{json,yaml,yml} > "${scratch}"
+	fi
+
+	if [ -z "$(cat "${scratch}")" ]; then
+		echo "No template files found. Skipping"
+		return 7
+	else
+		cat "${scratch}"
+	fi
+
+	echo '~~~ Running cfn-lint'
+
+	set +e
+	xargs cfn-lint -f json < "${scratch}" > "${output}"
+	exit_code=$?
+	set -e
+
+	if [ "${exit_code}" -ne 0 ]; then
+		tapify.py < "${output}"
+		return 1
+	else
+		return 0
+	fi
+}
+
+main "$@"

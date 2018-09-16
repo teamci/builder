@@ -1,9 +1,11 @@
 {
+  "cfnlint": "AWS CloudFomation template linting",
   "credo": "Elixir code linting",
   "custom": "Custom check",
   "editorconfig": "All files covered by .editorconfig",
   "eslint": "JavaScript/JSON linting",
   "gometalinter": "Aggregate multiple go linters",
+  "kubeval": "Validate Kubernetes manifests",
   "phpcs": "PHP linting",
   "rubocop": "Ruby static analysis",
   "syntax": "Static Configuration File Syntax Check",

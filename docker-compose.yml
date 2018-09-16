@@ -39,6 +39,14 @@ services:
     build: credo
     image: teamci/credo:v0.2.1
 
+  kubeval:
+    build: kubeval
+    image: teamci/kubeval:v0.1.0
+
+  cfnlint:
+    build: cfnlint
+    image: teamci/cfnlint:v0.1.0
+
   api:
     build: test/fake_api
     ports:

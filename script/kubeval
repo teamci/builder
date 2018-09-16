@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source .buildkite/hooks/pre-check
+
+docker-compose run \
+	--rm \
+	-v "${CODE_DIR}:/code" \
+	-v "${CONFIG_DIR}:/config" \
+	-w "/code" \
+	kubeval

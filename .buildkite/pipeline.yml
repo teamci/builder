@@ -28,5 +28,11 @@ steps:
   - label: credo
     command: script/credo
 
+  - label: kubeval
+    command: script/kubeval
+
+  - label: cfnlint
+    command: script/cfnlint
+
   - label: custom
     command: script/custom
