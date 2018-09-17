@@ -8,6 +8,9 @@ agent:
 blocks:
   - name: "Test"
     task:
+      prologue:
+        commands:
+          - checkout
       jobs:
         - name: Pipeline Tests
           commands:
