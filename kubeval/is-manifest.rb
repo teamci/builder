@@ -29,7 +29,7 @@ ARGV.each do |file|
     end
   rescue JSON::ParserError, Psych::SyntaxError => ex
     $stderr.puts("#{file} did not parse correctly: #{ex}")
-  rescue Pysch::DisallowedClass => ex
+  rescue Psych::DisallowedClass => ex
     $stderr.puts("#{file} #{ex}. Try wrapping values in quotes.")
   end
 end
