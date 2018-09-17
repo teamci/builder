@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 import cfnlint.decode
-import sys
+import sys, yaml
 
 def main(fileNames):
     for path in fileNames:
-        (data, _errors) = cfnlint.decode.decode(path, ignore_bad_template = True)
-        if data and 'AWSTemplateFormatVersion' in data:
-            print(path)
+        try:
+            (data, _errors) = cfnlint.decode.decode(path, ignore_bad_template = True)
+            if data and 'AWSTemplateFormatVersion' in data:
+                print(path)
+        except yaml.composer.ComposerError:
+            pass
 
 
 if __name__ == "__main__":

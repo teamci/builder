@@ -45,7 +45,7 @@ services:
 
   cfnlint:
     build: cfnlint
-    image: teamci/cfnlint:v0.1.1
+    image: teamci/cfnlint:v0.1.2
 
   api:
     build: test/fake_api
