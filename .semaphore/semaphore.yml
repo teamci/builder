@@ -1,0 +1,20 @@
+version: "v1.0"
+name: First pipeline example
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: "Test"
+    task:
+      jobs:
+        - name: Pipeline Tests
+          commands:
+            - make test-pipeline
+        - name: Lint Tests
+          commands:
+            - make test-lint
+        - name: Acceptance Tests
+          commands:
+            - make test-acceptance
