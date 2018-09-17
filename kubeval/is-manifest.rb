@@ -14,6 +14,10 @@ def manifest?(data)
     KEYS.all? do |key|
       data.key?(key)
     end
+  elsif data.is_a?(Array)
+    data.all? do |item|
+      manifest?(item)
+    end
   else
     false
   end
@@ -25,7 +29,7 @@ ARGV.each do |file|
     when /\.json$/
       $stdout.puts(file) if manifest?(JSON.parse(File.read(file)))
     when /\.ya?ml$/
-      $stdout.puts(file) if manifest?(YAML.safe_load(File.read(file)))
+      $stdout.puts(file) if manifest?(YAML.load_stream(File.read(file)))
     end
   rescue JSON::ParserError, Psych::SyntaxError => ex
     $stderr.puts("#{file} did not parse correctly: #{ex}")

@@ -20,6 +20,19 @@ load test_helper
 	refute_tap "${output}"
 }
 
+@test "kubeval: multi-manifest" {
+	use_code_fixture kubeval multi
+
+	run test/emulate-buildkite script/kubeval
+
+	[ $status -ne 0 ]
+
+	refute_tap "${output}"
+
+	echo "${output}" | grep -qF 'invalid Deployment'
+	echo "${output}" | grep -qF 'valid Service'
+}
+
 @test "kubeval: skips when no matching files" {
 	use_code_fixture kubeval skip
 
