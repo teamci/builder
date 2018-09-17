@@ -64,7 +64,7 @@ assert_tap() {
 
 assert_annotations() {
 	# Test for annotation keys
-	echo "${1}" | grep -qF 'path:'
+	echo "${1}" | grep -qE 'path: [^\.+\/]'
 	echo "${1}" | grep -qF 'start_line:'
 	echo "${1}" | grep -qF 'end_line:'
 	echo "${1}" | grep -qF 'annotation_level:'

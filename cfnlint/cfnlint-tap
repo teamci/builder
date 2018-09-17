@@ -41,7 +41,7 @@ main() {
 	echo '~~~ Running cfn-lint'
 
 	set +e
-	xargs cfn-lint -f json < "${scratch}" > "${output}"
+	xargs cfn-lint -f json < <(sed -E 's/^\.+\///g' < "${scratch}") > "${output}"
 	exit_code=$?
 	set -e
 
