@@ -36,7 +36,7 @@ test-acceptance: $(ENV)
 		FIXTURE_DIR=$(CURDIR)/test/fixtures \
 		PATH=$(CURDIR)/test/stubs/bin:$$PATH \
 		TEAMCI_API_URL=http://localhost:9292 \
-		TEAMCI_CODE_DIR=$(CURRDIR)/tmp/code \
+		TEAMCI_CODE_DIR=$(CURDIR)/tmp/code \
 		bats $(FILE)
 
 .PHONY: test-ci
