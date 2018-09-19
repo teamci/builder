@@ -40,7 +40,7 @@ test-acceptance: $(ENV)
 		bats $(FILE)
 
 .PHONY: test-ci
-test-ci: test-acceptance test-pipeline test-compose test-lint
+test-ci: test-acceptance test-compose test-lint
 
 tmp/buildkite-agent:
 	mkdir -p $@
