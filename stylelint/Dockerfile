@@ -2,7 +2,7 @@ FROM node:7-alpine
 
 RUN apk add --no-cache bash ruby jq \
 	&& apk add --no-cache --virtual .build-deps ruby-dev build-base \
-	&& npm install -g stylelint stylelint-config-standard \
+	&& npm install -q -g stylelint stylelint-config-standard \
 	&& gem install json --no-ri --no-rdoc \
 	&& apk del .build-deps
 
