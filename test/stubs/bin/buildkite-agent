@@ -24,6 +24,17 @@ metadata_command() {
 	esac
 }
 
+pipeline_command() {
+	case "${1:-}" in
+		upload)
+			metadata_command set pipeline "$(cat)"
+			;;
+		*)
+			echo "Cannot handle $*" 1>&2
+			return 1
+	esac
+}
+
 main() {
 	case "${1:-}" in
 		meta-data)
@@ -32,6 +43,10 @@ main() {
 			;;
 		reset)
 			rm -f "${BUILDKITE_AGENT_METADIR}/"*
+			;;
+		pipeline)
+			shift
+			pipeline_command "$@"
 			;;
 		*)
 			echo "Cannot handle $*" 1>&2

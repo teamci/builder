@@ -9,10 +9,6 @@ $(ENV): docker-compose.yml $(DOCKER_IMAGE_FILES) test/fake_api/*
 	@mkdir -p $(@D)
 	@touch $@
 
-.PHONY: test-pipeline
-test-pipeline:
-	docker run --rm -v $(CURDIR):/data -w /data ruby:2.5 ruby test/pipeline_test.rb
-
 .PHONY: test-compose
 test-compose:
 	docker run --rm -v $(CURDIR):/data -w /data ruby:2.5 ruby test/compose_test.rb
@@ -22,6 +18,7 @@ test-lint:
 	@echo '~~~ Linting Tests'
 	docker run --rm -v $(CURDIR):/data -w /data koalaman/shellcheck:v0.4.7 -f gcc \
 		$(wildcard script/*) \
+		.buildkite/pipeline \
 		$(wildcard .buildkite/hooks/*) \
 		$(wildcard test/stubs/bin/*) \
 		$(shell find . -name '*-tap' -print) \

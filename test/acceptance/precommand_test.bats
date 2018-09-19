@@ -24,30 +24,6 @@ load test_helper
 	echo "${output}" | grep -qF 'deleted-upstream'
 }
 
-@test "precommand: blacklisted" {
-	use_code_fixture credo pass
-	use_conf_fixture credo blacklist
-
-	run test/emulate-buildkite script/credo
-
-	[ $status -eq 7 ]
-	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
-}
-
-@test "precommand: whitelisted" {
-	use_code_fixture credo pass
-	use_conf_fixture credo whitelist
-
-	run test/emulate-buildkite script/credo
-
-	[ $status -eq 0 ]
-	[ -n "${output}" ]
-
-	[ -n "$(buildkite-agent meta-data get 'teamci.credo.title')" ]
-}
-
 @test "precommand: second test run after cloning code" {
 	use_code_fixture credo pass
 

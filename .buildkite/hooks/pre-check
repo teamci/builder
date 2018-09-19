@@ -138,17 +138,6 @@ set_title() {
 		"$(jq -re ".${BUILDKITE_LABEL}" titles.json)"
 }
 
-check_whitelist() {
-	echo '~~~ :white_check_mark: Checking whitelist'
-
-	local whitelist="${CONFIG_DIR}/whitelist"
-
-	if [ -f "${whitelist}" ] && ! grep -qF -- "${BUILDKITE_LABEL}" "${whitelist}"; then
-		echo "${BUILDKITE_LABEL} is not whitelisted. Skipping."
-		return 7
-	fi
-}
-
 if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	get_access_token
 	sync_code
@@ -156,7 +145,6 @@ if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
 	generate_file_list
 
 	set_title
-	check_whitelist
 
 	if [ -n "${CI:-}" ]; then
 		docker_pull
