@@ -27,7 +27,7 @@ metadata_command() {
 pipeline_command() {
 	case "${1:-}" in
 		upload)
-			metadata_command set pipeline "$(cat)"
+			metadata_command set pipeline "$(cat "${2}")"
 			;;
 		*)
 			echo "Cannot handle $*" 1>&2

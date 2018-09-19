@@ -52,7 +52,7 @@ main() {
 	generate_pipeline "${checks[@]}" | tee "${pipeline}"
 
 	echo "INFO: uploading to buildkite"
-	buildkite-agent pipeline upload < "${pipeline}"
+	buildkite-agent pipeline upload "${pipeline}"
 }
 
 main "$@"
