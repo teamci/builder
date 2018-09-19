@@ -23,4 +23,4 @@ blocks:
             - make test-lint
         - name: Acceptance Tests
           commands:
-            - make test-acceptance
+            - sudo make test-acceptance
