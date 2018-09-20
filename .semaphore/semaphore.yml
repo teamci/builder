@@ -25,4 +25,5 @@ blocks:
           commands:
             - sudo make test-acceptance
           env_vars:
-            CI: "true"
+            - name: CI
+              value: "true"
