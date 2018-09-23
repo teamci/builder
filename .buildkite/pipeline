@@ -26,7 +26,10 @@ main() {
 	pipeline="$(mktemp)"
 	local -a checks=()
 
-	if [ -f "${CONFIG_DIR}/whitelist" ]; then
+	if [ -n "$(buildkite-agent meta-data get teamci.retry.name 2>/dev/null)" ]; then
+		echo 'INFO: generating retry pipeline'
+		checks+=("$(buildkite-agent meta-data get teamci.retry.name)")
+	elif [ -f "${CONFIG_DIR}/whitelist" ]; then
 		echo 'INFO: Generating whitelisted pipeline'
 		while read -r check; do
 			if jq -re ".${check}" titles.json > /dev/null; then

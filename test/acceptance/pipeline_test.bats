@@ -86,3 +86,17 @@ assert_pipeline() {
 
 	[ "${all_checks}" -eq "${steps}" ]
 }
+
+@test "pipeline: retry check set" {
+	use_code_fixture pipeline noop
+	use_conf_fixture pipeline no-whitelist
+
+	buildkite-agent meta-data set teamci.retry.name rubocop
+
+	generate_pipeline
+
+	local steps="$(echo "${output}" | jq -re '.steps | length')"
+
+	[ "${steps}" -eq 1 ]
+	[ "$(echo "${output}" | jq -re '.steps[0].label')" = 'rubocop' ]
+}
