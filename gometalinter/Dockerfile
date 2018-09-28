@@ -1,6 +1,7 @@
 FROM golang:1.11-alpine
 
-RUN apk add --no-cache bash ruby git subversion mercurial bzr build-base \
+RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories \
+	&& apk add --no-cache bash ruby git subversion mercurial bzr build-base \
 	&& apk add --no-cache --virtual .build-deps ruby-dev \
 	&& go get -u gopkg.in/alecthomas/gometalinter.v2 \
 	&& ln -sf $GOPATH/bin/gometalinter.v2 $GOPATH/bin/gometalinter \

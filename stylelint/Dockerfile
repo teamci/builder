@@ -1,6 +1,7 @@
 FROM node:7-alpine
 
-RUN apk add --no-cache bash ruby jq \
+RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories \
+	&& apk add --no-cache bash ruby jq \
 	&& apk add --no-cache --virtual .build-deps ruby-dev build-base \
 	&& npm install -g stylelint stylelint-config-standard \
 	&& gem install json --no-ri --no-rdoc \

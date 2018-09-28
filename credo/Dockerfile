@@ -1,6 +1,7 @@
 FROM elixir:1.6-alpine
 
-RUN apk add --no-cache bash ruby jq \
+RUN sed -i -e 's/dl-cdn/dl-4/' /etc/apk/repositories \
+	&& apk add --no-cache bash ruby jq \
 	&& apk add --no-cache --virtual .build-deps ruby-dev build-base curl \
 	&& gem install json --no-ri --no-rdoc \
 	&& mkdir -p /usr/src/credo /usr/src/bunt \
