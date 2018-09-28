@@ -3,7 +3,7 @@ version: '2'
 services:
   syntax:
     build: syntax
-    image: teamci/syntax:v0.2.1
+    image: teamci/syntax:v0.2.2
 
   editorconfig:
     build: editorconfig
