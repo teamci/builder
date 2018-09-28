@@ -59,3 +59,24 @@ load test_helper
 
 	[ $status -eq 0 ]
 }
+
+@test "precommand: [REGRESSION] file list contains file that doesn't exit" {
+	use_code_fixture custom pass
+	use_conf_fixture custom pass
+	set_test_files -f /null/foo .gitkeep
+
+	run test/emulate-buildkite script/syntax
+
+	! grep -qF '/null/foo' "${TEAMCI_CODE_DIR}/custom/code/.teamci_test_files"
+	grep -qF '.gitkeep' "${TEAMCI_CODE_DIR}/custom/code/.teamci_test_files"
+}
+
+@test "precommand: [REGRESSION] file list is all non-existent" {
+	use_code_fixture custom pass
+	use_conf_fixture custom pass
+	set_test_files -f /null/foo
+
+	run test/emulate-buildkite script/syntax
+
+	[ ! -f "${TEAMCI_CODE_DIR}/custom/code/.teamci_test_files" ]
+}

@@ -110,11 +110,24 @@ generate_file_list() {
 	echo "~~~ :git: Generate list of test files"
 
 	if buildkite-agent meta-data get 'teamci.check_suite.files' | jq -re '.[]' &> /dev/null; then
-		buildkite-agent meta-data get 'teamci.check_suite.files' \
-			| jq -re '.[]' > "${CODE_DIR}/.teamci_test_files"
+		local -a files=()
 		echo "INFO: Found list of possible files"
 
-		cat "${CODE_DIR}/.teamci_test_files"
+		while read -r path; do
+			if [ -f "${CODE_DIR}/${path}" ]; then
+				files+=( "${path}" )
+			else
+				echo "WARN: ${path} does not exist"
+			fi
+		done < <(buildkite-agent meta-data get 'teamci.check_suite.files' | jq -re '.[]')
+
+		if [ ${#files[@]} -gt 0 ]; then
+			for path in "${files[@]}"; do
+				echo "${path}" >> "${CODE_DIR}/.teamci_test_files"
+			done
+
+			cat "${CODE_DIR}/.teamci_test_files"
+		fi
 	else
 		echo 'INFO: No file list specified. Testing all files.'
 	fi

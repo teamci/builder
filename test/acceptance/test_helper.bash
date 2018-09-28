@@ -24,7 +24,22 @@ use_empty_config() {
 }
 
 set_test_files() {
-	local slug branch temp
+	local OPTIND
+	local slug branch temp force
+
+	while getopts ':f' opt; do
+		case "${opt}" in
+			f)
+				force="true"
+				;;
+			\?)
+				echo "Unknown option -${OPTARG}" 1>&2
+				return 1
+				;;
+		esac
+	done
+
+	shift $((OPTIND-1))
 
 	if ! buildkite-agent meta-data get 'teamci.repo.slug' > /dev/null; then
 		echo "no repo set"
@@ -40,12 +55,14 @@ set_test_files() {
 	branch="$(buildkite-agent meta-data get 'teamci.head_branch')"
 	temp="$(mktemp)"
 
-	for file in "$@"; do
-		if [ ! -f "${FIXTURE_DIR}/${slug}/${branch}/${file}" ]; then
-			echo "${file} is not declared in the fixture"
-			return 1
-		fi
-	done
+	if [ -z "${force:-}" ]; then
+		for file in "$@"; do
+			if [ ! -f "${FIXTURE_DIR}/${slug}/${branch}/${file}" ]; then
+				echo "${file} is not declared in the fixture"
+				return 1
+			fi
+		done
+	fi
 
 	for file in "$@"; do
 		echo "[ \"${file}\" ]" >> "${temp}"
