@@ -39,10 +39,14 @@ main() {
 
 	local check_exit_code
 
+	touch logs/tap.log
+
 	set +e
 	docker run --rm \
 		-v "${CODE_DIR}:/data/code:ro" \
 		-v "${CONFIG_DIR}:/data/config:ro" \
+		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
+		-e "TEAMCI_TAP_LOG_OUTPUT=/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
 		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee "logs/${TEAMCI_CHECK_NAME}".log
