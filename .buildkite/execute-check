@@ -35,7 +35,7 @@ main() {
 
 	docker run --rm \
 		-v "${CODE_DIR}/data/code:ro" \
-		-v "${CONFIG__DIR}/data/config:ro" \
+		-v "${CONFIG_DIR}/data/config:ro" \
 		--cpus 1 \
 		--memory 512m \
 		"${TEAMCI_CHECK_IMAGE}"
