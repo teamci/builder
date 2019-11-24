@@ -48,6 +48,8 @@ main() {
 		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee "logs/${TEAMCI_CHECK_NAME}".log
 	check_exit_code=$?
 	set -e
+
+	return "${check_exit_code}"
 }
 
 main "$@"
