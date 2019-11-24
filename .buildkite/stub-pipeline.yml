@@ -1,0 +1,11 @@
+---
+env:
+  BUILDKITE_TIMEOUT: 15
+steps:
+  - label: welcome
+    command: .buildkite/execute-check
+    env:
+      TEAMCI_CHECK_NAME: welcome
+      TEAMCI_CHECK_IMAGE: teamci/welcome
+      TEAMCI_CHECK_TITLE: Welcome to TeamCI!
+      TEAMCI_CHECK_OUTPUT: raw

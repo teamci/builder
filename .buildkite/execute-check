@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+main() {
+	source .buildkite/hooks/pre-check
+
+	if [ -z "${TEAMCI_CHECK_NAME:-}" ]; then
+		echo "FATAL: Internal error. TEAMCI_CHECK_NAME missing. Please contact support."
+		return 7
+	fi
+
+	if [ -z "${TEAMCI_CHECK_IMAGE:-}" ]; then
+		echo "FATAL: Internal error. TEAMCI_CHECK_IMAGE missing. Please contact support."
+		return 7
+	fi
+
+	if [ -z "${TEAMCI_CHECK_TITLE:-}" ]; then
+		echo "FATAL: Internal error. TEAMCI_CHECK_TITLE missing. Please contact support."
+		return 7
+	fi
+
+	if [ -z "${TEAMCI_CHECK_OUTPUT:-}" ]; then
+		echo "FATAL: Internal error. TEAMCI_CHECK_OUTPUT missing. Please contact support."
+		return 7
+	fi
+
+	buildkite-agent meta-data set \
+		"teamci.${TEAMCI_CHECK_NAME}.title" \
+		"${TEAMCI_CHECK_TITLE}"
+
+	docker run --rm \
+		-v "${CODE_DIR}/data/code:ro" \
+		-v "${CONFIG__DIR}/data/config:ro" \
+		--cpus 1 \
+		--memory 512m \
+		"${TEAMCI_CHECK_IMAGE}"
+}
+
+main "$@"

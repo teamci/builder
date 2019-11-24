@@ -151,15 +151,15 @@ set_title() {
 		"$(jq -re ".${BUILDKITE_LABEL}" titles.json)"
 }
 
-if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
-	get_access_token
-	sync_code
-	sync_config
-	generate_file_list
-
-	set_title
-
-	if [ -n "${CI:-}" ]; then
-		docker_pull
-	fi
-fi
+# if [ "${BUILDKITE_LABEL}" != ":pipeline:" ]; then
+# 	get_access_token
+# 	sync_code
+# 	sync_config
+# 	generate_file_list
+#
+# 	set_title
+#
+# 	if [ -n "${CI:-}" ]; then
+# 		docker_pull
+# 	fi
+# fi
