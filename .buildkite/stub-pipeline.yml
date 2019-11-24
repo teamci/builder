@@ -4,6 +4,8 @@ env:
 steps:
   - label: welcome
     command: .buildkite/execute-check
+    artifact_paths:
+      - logs/**/*
     env:
       TEAMCI_CHECK_NAME: welcome
       TEAMCI_CHECK_IMAGE: teamci/welcome

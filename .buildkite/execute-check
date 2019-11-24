@@ -25,6 +25,8 @@ main() {
 		return 7
 	fi
 
+	mkdir -p logs
+
 	get_access_token
 	sync_code
 	sync_config
@@ -35,12 +37,17 @@ main() {
 
 	echo "~~~ Running check"
 
+	local check_exit_code
+
+	set +e
 	docker run --rm \
 		-v "${CODE_DIR}:/data/code:ro" \
 		-v "${CONFIG_DIR}:/data/config:ro" \
 		--cpus 1 \
 		--memory 512m \
-		"${TEAMCI_CHECK_IMAGE}"
+		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee "logs/${TEAMCI_CHECK_NAME}".log
+	check_exit_code=$?
+	set -e
 }
 
 main "$@"
