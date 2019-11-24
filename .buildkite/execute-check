@@ -33,6 +33,8 @@ main() {
 		"teamci.${TEAMCI_CHECK_NAME}.title" \
 		"${TEAMCI_CHECK_TITLE}"
 
+	echo "~~~ Running check"
+
 	docker run --rm \
 		-v "${CODE_DIR}:/data/code:ro" \
 		-v "${CONFIG_DIR}:/data/config:ro" \
