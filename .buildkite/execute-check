@@ -10,11 +10,6 @@ main() {
 		return 7
 	fi
 
-	if [ -z "${TEAMCI_CHECK_OUTPUT:-}" ]; then
-		echo "FATAL: Internal error. TEAMCI_CHECK_OUTPUT missing. Please contact support."
-		return 7
-	fi
-
 	mkdir -p logs
 
 	get_access_token
@@ -24,13 +19,10 @@ main() {
 
 	local check_exit_code
 
-	touch logs/tap.log
-
 	set +e
 	docker run --rm \
 		-v "${CODE_DIR}:/data/code:ro" \
 		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
-		-e "TEAMCI_TAP_LOG_OUTPUT=/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
 		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee logs/check.log
