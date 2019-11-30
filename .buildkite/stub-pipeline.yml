@@ -8,3 +8,4 @@ steps:
       - logs/**/*
     env:
       TEAMCI_CHECK_IMAGE: teamci/welcome
+      TEAMCI_CHECK_NAME: welcome

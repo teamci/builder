@@ -11,6 +11,8 @@ run_check() {
 	get_access_token
 	sync_code
 
+	buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" "markdown"
+
 	echo "~~~ Running check"
 
 	local check_exit_code
