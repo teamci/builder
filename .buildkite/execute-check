@@ -2,16 +2,7 @@
 
 set -euo pipefail
 
-main() {
-	mkdir -p logs
-
-	touch logs/check.log
-
-	exec >> tee logs/check.log
-	exec 2>&1
-
-	source .buildkite/hooks/pre-check
-
+run_check() {
 	if [ -z "${TEAMCI_CHECK_IMAGE:-}" ]; then
 		echo "FATAL: Internal error. TEAMCI_CHECK_IMAGE missing. Please contact support."
 		return 7
@@ -35,6 +26,14 @@ main() {
 	set -e
 
 	return "${check_exit_code}"
+}
+
+main() {
+	mkdir -p logs
+
+	source .buildkite/hooks/pre-check
+
+	run_check 2>&1 >> logs/check.log
 }
 
 main "$@"
