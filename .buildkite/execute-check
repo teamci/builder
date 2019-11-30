@@ -29,11 +29,6 @@ main() {
 
 	get_access_token
 	sync_code
-	sync_config
-
-	buildkite-agent meta-data set \
-		"teamci.${TEAMCI_CHECK_NAME}.title" \
-		"${TEAMCI_CHECK_TITLE}"
 
 	echo "~~~ Running check"
 
