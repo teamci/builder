@@ -33,7 +33,7 @@ main() {
 
 	source .buildkite/hooks/pre-check
 
-	run_check 2>&1 > tee -a logs/check.log
+	run_check 2>&1 | tee -a logs/check.log
 }
 
 main "$@"
