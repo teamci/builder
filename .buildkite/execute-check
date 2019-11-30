@@ -5,6 +5,8 @@ set -euo pipefail
 main() {
 	mkdir -p logs
 
+	touch logs/check.log
+
 	exec >> tee logs/check.log
 	exec 2>&1
 
