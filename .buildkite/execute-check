@@ -5,7 +5,7 @@ set -euo pipefail
 main() {
 	mkdir -p logs
 
-	exec >> logs/check.log
+	exec >> tee logs/check.log
 	exec 2>&1
 
 	source .buildkite/hooks/pre-check
