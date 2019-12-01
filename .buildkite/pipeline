@@ -19,7 +19,7 @@ main() {
 
 	scratch="$(mktemp)"
 
-	if ! buildkite-agent metadata get 'teamci.pipeline_url' > /dev/null; then
+	if ! buildkite-agent meta-data get 'teamci.pipeline_url' > /dev/null; then
 		echo 'FATAL: could load pipeline configuration. Please contact support'
 		return 1
 	fi
