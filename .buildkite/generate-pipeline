@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'json'
-require 'yaml'
 
 pipeline = {
 	env: {
@@ -25,4 +24,4 @@ pipeline[:steps] = data.fetch('checks').map do |check|
 	}
 end
 
-$stdout.puts(YAML.dump(pipeline))
+$stdout.puts(JSON.dump(pipeline))

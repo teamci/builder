@@ -2,19 +2,7 @@
 
 set -euo pipefail
 
-generate_pipeline() {
-	echo 'env:'
-	echo '  BUILDKITE_TIMEOUT: 15'
-	echo 'steps:'
-	for check in "$@"; do
-		echo "  - label: ${check}"
-		echo "    command: script/${check}"
-	done
-}
-
 main() {
-	source .buildkite/hooks/pre-check
-
 	local teamci_pipeline buildkite_pipeline
 
 	teamci_pipeline="$(mktemp)"
