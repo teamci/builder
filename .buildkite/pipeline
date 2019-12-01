@@ -36,6 +36,9 @@ main() {
 		"$(buildkite-agent meta-data get 'teamci.pipeline_url')" \
 		| tee "${scratch}"
 
+	# Insert a newline after the HTTP body
+	echo
+
 	echo '~~~ :pipeline: Uploading'
 
 	.buildkite/generate-pipeline < "${scratch}" | buildkite-agent pipeline upload
