@@ -39,9 +39,13 @@ main() {
 	# Insert a newline after the HTTP body
 	echo
 
+	echo '~~~ :pipeline: Generating'
+
+	.buildkite/generate-pipeline < "${scratch}" | tee "${scratch}"
+
 	echo '~~~ :pipeline: Uploading'
 
-	.buildkite/generate-pipeline < "${scratch}" | buildkite-agent pipeline upload
+	buildkite-agent pipeline upload "${scratch}"
 }
 
 main "$@"
