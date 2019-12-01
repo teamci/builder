@@ -13,50 +13,9 @@ generate_pipeline() {
 }
 
 main() {
-	# Short circuit the pre-check hook to not execute anything but
-	# to export the functions instead
-	export BUILDKITE_LABEL=":pipeline:"
-	source .buildkite/hooks/pre-check
-
-	get_access_token
-	sync_code
+	ruby -v
 
 	buildkite-agent pipeline upload .buildkite/stub-pipeline.yml
-
-	# local pipeline
-	# pipeline="$(mktemp)"
-	# local -a checks=()
-  #
-	# if [ -n "$(buildkite-agent meta-data get teamci.retry.name 2>/dev/null)" ]; then
-	# 	echo 'INFO: generating retry pipeline'
-	# 	checks+=("$(buildkite-agent meta-data get teamci.retry.name)")
-	# elif [ -f "${CONFIG_DIR}/whitelist" ]; then
-	# 	echo 'INFO: Generating whitelisted pipeline'
-	# 	while read -r check; do
-	# 		if jq -re ".${check}" titles.json > /dev/null; then
-	# 			checks+=("${check}")
-	# 		else
-	# 			echo "WARN: ${check} whitelisted, but is not a valid check"
-	# 		fi
-	# 	done < "${CONFIG_DIR}/whitelist"
-  #
-	# 	if [ "${#checks}" -eq 0 ]; then
-	# 		echo 'WARN: all whitelisted checks are invalid. Falling back to a full pipeline.'
-	# 		while read -r check; do
-	# 			checks+=("${check}")
-	# 		done < <(jq -re '. | keys[]' titles.json)
-	# 	fi
-	# else
-	# 	echo 'INFO: generating full pipeline'
-	# 	while read -r check; do
-	# 		checks+=("${check}")
-	# 	done < <(jq -re '. | keys[]' titles.json)
-	# fi
-  #
-	# generate_pipeline "${checks[@]}" | tee "${pipeline}"
-  #
-	# echo "INFO: uploading to buildkite"
-	# buildkite-agent pipeline upload "${pipeline}"
 }
 
 main "$@"
