@@ -31,8 +31,8 @@ main() {
 		--show-error \
 		--retry 3 \
 		--retry-delay 30 \
-		"$(buildkite-agent metadata get 'temaci.pipeline_url')" \
-		| tee "${scatch}"
+		"$(buildkite-agent meta-data get 'teamci.pipeline_url')" \
+		| tee "${scratch}"
 
 	.buildkite/generate-pipeline < "${scratch}" | buildkite-agent pipeline upload
 }
