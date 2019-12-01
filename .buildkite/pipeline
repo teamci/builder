@@ -24,6 +24,8 @@ main() {
 		return 1
 	fi
 
+	echo '~~~ :pipeline: Fetching'
+
 	curl \
 		-H 'Accept: application/json' \
 		--fail \
@@ -33,6 +35,8 @@ main() {
 		--retry-delay 30 \
 		"$(buildkite-agent meta-data get 'teamci.pipeline_url')" \
 		| tee "${scratch}"
+
+	echo '~~~ :pipeline: Uploading'
 
 	.buildkite/generate-pipeline < "${scratch}" | buildkite-agent pipeline upload
 }
