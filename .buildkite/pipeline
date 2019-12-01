@@ -13,9 +13,28 @@ generate_pipeline() {
 }
 
 main() {
-	ruby -v
+	source .buildkite/hooks/pre-check
 
-	buildkite-agent pipeline upload .buildkite/stub-pipeline.yml
+	local scratch
+
+	scratch="$(mktemp)"
+
+	if ! buildkite-agent metadata get 'teamci.pipeline_url' > /dev/null; then
+		echo 'FATAL: could load pipeline configuration. Please contact support'
+		return 1
+	fi
+
+	curl \
+		-H 'Content-Type: application/json' \
+		--fail \
+		--silent \
+		--show-error \
+		--retry 3 \
+		--retry-delay 30 \
+		"$(buildkite-agent metadata get 'temaci.pipeline_url')" \
+		| tee "${scatch}"
+
+	.buildkite/generate-pipeline < "${scratch}" | buildkite-agent pipeline upload
 }
 
 main "$@"

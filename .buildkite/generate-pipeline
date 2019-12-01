@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'yaml'
+
+pipeline = {
+	env: {
+		BUILDKITE_TIMEOUT: '15'
+	}
+}
+
+data = JSON.load($stdin)
+
+pipeline[:steps] = data.fetch('checks').map do |check|
+	{
+		label: check.fetch('name'),
+		command: .buildkite/execute-check
+		artifact_paths: [
+			'logs/**/*'
+		],
+		env: {
+			TEAMCI_CHECK_IMAGE: check.fetch('image'),
+			TEAMCI_CHECK_NAME: check.fetch('name'),
+		}
+	}
+end
+
+$stdout.puts(YAML.dump(pipeline))
