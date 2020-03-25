@@ -9,7 +9,7 @@ pipeline = {
   }
 }
 
-data = JSON.parse($stdin)
+data = JSON.parse($stdin.read)
 
 pipeline[:steps] = data.fetch('checks').map do |check|
   {
