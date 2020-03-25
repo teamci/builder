@@ -18,7 +18,7 @@ run_check() {
 
 	local output_format
 
-	output_format="$(docker inspect -f '{{ index .Config.Labels "com.teamci.output" }}')"
+	output_format="$(docker inspect -f '{{ index .Config.Labels "com.teamci.output" }}' "${TEAMCI_CHECK_IMAGE}")"
 
 	if [ -n "${output_format:-}" ]; then
 		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" "${output_format}"
