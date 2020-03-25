@@ -1,0 +1,15 @@
+AllCops:
+  Exclude:
+    - 'cfnlint/**/*'
+    - 'credo/**/*'
+    - 'eslint/**/*'
+    - 'gometalinter/**/*'
+    - 'kubeval/**/*'
+    - 'phpcs**/*'
+    - 'rubocop/**/*'
+    - 'shellcheck/**/*'
+    - 'stylelint/**/*'
+    - 'syntax/**/*'
+    - 'test/**/*'
+  Include:
+    - .buildkite/generate-pipeline
