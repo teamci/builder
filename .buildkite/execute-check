@@ -11,7 +11,20 @@ run_check() {
 	get_access_token
 	sync_code
 
-	buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" "markdown"
+	echo "~~~ Pulling image"
+	docker pull "${TEAMCI_CHECK_IMAGE}"
+
+	echo "~~~ Setting output format"
+
+	local output_format
+
+	output_format="$(docker inspect -f '{{ index .Config.Labels "com.teamci.output" }}')"
+
+	if [ -n "${output_format:-}" ]; then
+		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" "${output_format}"
+	else
+		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" 'plain'
+	fi
 
 	echo "~~~ Running check"
 
