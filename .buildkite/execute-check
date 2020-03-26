@@ -71,7 +71,7 @@ main() {
 	log::indicator 'Fetching Access Token' | tee -a "${check_log}"
 
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
-	if log::exec_command curl --slient --show-error -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}" 2>&1 | tee -a "${check_log}" then
+	if log::exec_command curl --slient --show-error -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}" 2>&1 | tee -a "${check_log}"; then
 		log::info 'retrieved git access token'
 		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
 	else
