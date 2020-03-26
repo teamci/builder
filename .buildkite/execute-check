@@ -2,24 +2,51 @@
 
 set -euo pipefail
 
-get_access_token() {
+log::header() {
+	echo "=> $*"
+}
+
+log::indicator() {
+	echo "-> $*"
+}
+
+log::exec_command() {
+	log::indicator "$@"
+	"$@"
+}
+
+log::fatal() {
+	echo "FATAL: $*"
+}
+
+log::error() {
+	echo "ERROR: $*"
+}
+
+log::warn() {
+	echo "WARN: $*"
+}
+
+log::info() {
+	echo "INFO: $*"
+}
+
+main() {
 	local scratch
 	scratch="$(mktemp)"
 
-	echo '=> Fetching Access Token'
-	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
-	if curl -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}"; then
-		echo 'INFO: retrieved git access token'
-		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
-	else
-		echo 'FATAL: Could not fetch clone access token. This is an internal error. You can attempt a retry.'
-		echo 'WARN: Skipping this check for now. Contact support if this continues.'
-		return 7
-	fi
-}
+	touch log/check.log
 
-sync_code() {
-	echo '=> Cloning code'
+	log::header 'Preflight check'
+
+	if [ -z "${TEAMCI_CHECK_IMAGE:-}" ]; then
+		log::fatal "Internal error. TEAMCI_CHECK_IMAGE missing. Please contact support."
+		return 1
+	fi
+
+	log::header 'Preparing environment' | tee -a check.log
+	log::indicator 'Loading git metadata' | tee -a check.log
+
 	local repo head_sha head_branch
 
 	repo="$(buildkite-agent meta-data get teamci.repo.slug)"
@@ -27,7 +54,7 @@ sync_code() {
 	head_branch="$(buildkite-agent meta-data get teamci.head_branch)"
 
 	if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
-		echo "FATAL: Missing repo/sha/branch metadata" 1>&2
+		log::fatal "Missing repo/sha/branch metadata" | tee -a check.log
 		return 1
 	fi
 
@@ -35,41 +62,41 @@ sync_code() {
 	export TEAMCI_REPO_SLUG="${repo}"
 	export TEAMCI_COMMIT="${head_sha}"
 
+	log::indicator 'Fetching Access Token' | tee -a check.log
+
+	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
+	if log::exec_command curl --slient --show-error -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}" 2>&1 | tee -a check.log; then
+		log::info 'retrieved git access token'
+		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
+	else
+		log::fatal 'Could not fetch an access token. This is an internal error. You may attempt a retry. Contact support if the problem persists.'
+		return 1
+	fi
+
+	log::header 'Cloning' | tee -a logs/check.log
+
 	if [ -d "${CODE_DIR}/.git" ]; then
 		pushd "${CODE_DIR}" > /dev/null
 
-		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git"
+		log_exec_command git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" 2>&1 | tee -a logs/check.log
 	else
 		mkdir -p "${CODE_DIR}"
 
-		git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}"
+		log_exec_command git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}" 2>&1 | tee -a logs/check.log
 
 		pushd "${CODE_DIR}" > /dev/null
 	fi
 
 	if git fetch -v --prune origin "${head_branch}" && git checkout -f "${head_sha}"; then
-		git clean -fdx
-		echo "INFO: code ${head_branch} @ ${head_sha} ready"
+		log_exec_command git clean -fdx 2>&1 | tee -a logs/check.log
 		popd > /dev/null
 	else
-		echo "WARN: could not sync code. Was the branch deleted upstream? Skipping check."
-		return 7
-	fi
-}
-
-run_check() {
-	if [ -z "${TEAMCI_CHECK_IMAGE:-}" ]; then
-		echo "FATAL: Internal error. TEAMCI_CHECK_IMAGE missing. Please contact support."
+		log::warn "Could not sync code. Was the branch deleted upstream? Skipping check." | tee -a logs/check.log
 		return 7
 	fi
 
-	touch logs/execution.log
-
-	get_access_token
-	sync_code
-
-	echo "=> Pulling image" | tee -a logs/execution.log
-	docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a logs/execution.log
+	echo "=> Pulling image" | tee -a logs/check.log
+	docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a logs/check.log
 
 	local output_format
 
@@ -81,27 +108,21 @@ run_check() {
 		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" 'plain'
 	fi
 
-	echo "=> Executing check" | tee -a logs/execution.log
+	log::header "Executing check" | tee -a logs/check.log
 
 	local check_exit_code
 
 	set +e
-	docker run --rm \
+	log::exec_command docker run --rm \
 		-v "${CODE_DIR}:/data/code:ro" \
 		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
-		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee -a logs/execution.log
+		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee -a logs/execution.log | tee -a logs/check.log
 	check_exit_code=$?
 	set -e
 
 	return "${check_exit_code}"
-}
-
-main() {
-	mkdir -p logs
-
-	run_check 2>&1 | tee -a logs/check.log
 }
 
 main "$@"
