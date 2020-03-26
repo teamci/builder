@@ -35,7 +35,13 @@ main() {
 	local scratch
 	scratch="$(mktemp)"
 
-	touch log/check.log
+	local -r check_log="logs/check.log"
+	local -r execution_log="logs/execution.log"
+
+	mkdir -p "$(dirname "${check_log}")"
+	mkdir -p "$(dirname "${execution_log}")"
+
+	touch logs/check.log
 
 	log::header 'Preflight check'
 
@@ -44,8 +50,8 @@ main() {
 		return 1
 	fi
 
-	log::header 'Preparing environment' | tee -a check.log
-	log::indicator 'Loading git metadata' | tee -a check.log
+	log::header 'Preparing environment' | tee -a "${check_log}"
+	log::indicator 'Loading git metadata' | tee -a "${check_log}"
 
 	local repo head_sha head_branch
 
@@ -54,7 +60,7 @@ main() {
 	head_branch="$(buildkite-agent meta-data get teamci.head_branch)"
 
 	if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
-		log::fatal "Missing repo/sha/branch metadata" | tee -a check.log
+		log::fatal "Missing repo/sha/branch metadata" | tee -a "${check_log}"
 		return 1
 	fi
 
@@ -62,10 +68,10 @@ main() {
 	export TEAMCI_REPO_SLUG="${repo}"
 	export TEAMCI_COMMIT="${head_sha}"
 
-	log::indicator 'Fetching Access Token' | tee -a check.log
+	log::indicator 'Fetching Access Token' | tee -a "${check_log}"
 
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
-	if log::exec_command curl --slient --show-error -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}" 2>&1 | tee -a check.log; then
+	if log::exec_command curl --slient --show-error -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}" 2>&1 | tee -a "${check_log}" then
 		log::info 'retrieved git access token'
 		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
 	else
@@ -73,30 +79,30 @@ main() {
 		return 1
 	fi
 
-	log::header 'Cloning' | tee -a logs/check.log
+	log::header 'Cloning' | tee -a "${check_log}"
 
 	if [ -d "${CODE_DIR}/.git" ]; then
 		pushd "${CODE_DIR}" > /dev/null
 
-		log_exec_command git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" 2>&1 | tee -a logs/check.log
+		log::exec_command git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" 2>&1 | tee -a "${check_log}"
 	else
 		mkdir -p "${CODE_DIR}"
 
-		log_exec_command git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}" 2>&1 | tee -a logs/check.log
+		log::exec_command git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}" 2>&1 | tee -a "${check_log}"
 
 		pushd "${CODE_DIR}" > /dev/null
 	fi
 
 	if git fetch -v --prune origin "${head_branch}" && git checkout -f "${head_sha}"; then
-		log_exec_command git clean -fdx 2>&1 | tee -a logs/check.log
+		log::exec_command git clean -fdx 2>&1 | tee -a "${check_log}"
 		popd > /dev/null
 	else
-		log::warn "Could not sync code. Was the branch deleted upstream? Skipping check." | tee -a logs/check.log
+		log::warn "Could not sync code. Was the branch deleted upstream? Skipping check." | tee -a "${check_log}"
 		return 7
 	fi
 
-	echo "=> Pulling image" | tee -a logs/check.log
-	docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a logs/check.log
+	echo "=> Pulling image" | tee -a "${check_log}"
+	log::exec_command docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a "${check_log}"
 
 	local output_format
 
@@ -108,7 +114,7 @@ main() {
 		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" 'plain'
 	fi
 
-	log::header "Executing check" | tee -a logs/check.log
+	log::header "Executing check" | tee -a "${check_log}"
 
 	local check_exit_code
 
@@ -118,7 +124,7 @@ main() {
 		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
-		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee -a logs/execution.log | tee -a logs/check.log
+		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee -a "${execution_log}" | tee -a "${check_log}"
 	check_exit_code=$?
 	set -e
 
