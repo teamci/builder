@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -xeuo pipefail
+set -euo pipefail
 
 get_access_token() {
 	local scratch
@@ -65,8 +65,8 @@ run_check() {
 
 	touch logs/execution.log
 
-	get_access_token 2>&1 | tee -a logs/execution.log
-	sync_code 2>&1 | tee -a logs/execution.log
+	get_access_token
+	sync_code
 
 	echo "=> Pulling image" | tee -a logs/execution.log
 	docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a logs/execution.log
