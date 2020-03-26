@@ -35,8 +35,8 @@ main() {
 	local scratch
 	scratch="$(mktemp)"
 
-	local -r check_log="logs/check.log"
-	local -r execution_log="logs/execution.log"
+	local -r check_log="${PWD}/logs/check.log"
+	local -r execution_log="${PWD}/logs/execution.log"
 
 	mkdir -p "$(dirname "${check_log}")"
 	mkdir -p "$(dirname "${execution_log}")"
