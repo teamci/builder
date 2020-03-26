@@ -8,13 +8,13 @@ run_check() {
 		return 7
 	fi
 
-	get_access_token
-	sync_code
+	touch logs/execution.log
 
-	echo "~~~ Pulling image"
-	docker pull "${TEAMCI_CHECK_IMAGE}"
+	get_access_token 2>&1 | tee -a logs/execution.log
+	sync_code 2>&1 | tee -a logs/execution.log
 
-	echo "~~~ Setting output format"
+	echo "=> Pulling image" | tee -a logs/execution.log
+	docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a logs/execution.log
 
 	local output_format
 
@@ -26,7 +26,7 @@ run_check() {
 		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" 'plain'
 	fi
 
-	echo "~~~ Running check"
+	echo "=> Executing check" | tee -a logs/execution.log
 
 	local check_exit_code
 
@@ -36,7 +36,7 @@ run_check() {
 		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
-		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee logs/execution.log
+		"${TEAMCI_CHECK_IMAGE}" 2>&1 | tee -a logs/execution.log
 	check_exit_code=$?
 	set -e
 

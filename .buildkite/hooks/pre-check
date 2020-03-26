@@ -6,7 +6,7 @@ get_access_token() {
 	local scratch
 	scratch="$(mktemp)"
 
-	echo '~~~ :json: Fetching Access Token'
+	echo '=> Fetching Access Token'
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
 	if curl -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}"; then
 		echo 'INFO: retrieved git access token'
@@ -19,7 +19,7 @@ get_access_token() {
 }
 
 sync_code() {
-	echo '~~~ :git: Cloning code'
+	echo '=> Cloning code'
 	local repo head_sha head_branch
 
 	repo="$(buildkite-agent meta-data get teamci.repo.slug)"
@@ -36,20 +36,16 @@ sync_code() {
 	export TEAMCI_COMMIT="${head_sha}"
 
 	if [ -d "${CODE_DIR}/.git" ]; then
-		echo '~~~ :git: Updating origin with access token'
 		pushd "${CODE_DIR}" > /dev/null
 
 		git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git"
 	else
-		echo "~~~ :git: Cloning ${repo}"
 		mkdir -p "${CODE_DIR}"
 
 		git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${repo}.git" "${CODE_DIR}"
 
 		pushd "${CODE_DIR}" > /dev/null
 	fi
-
-	echo '~~~ :git: Checking out'
 
 	if git fetch -v --prune origin "${head_branch}" && git checkout -f "${head_sha}"; then
 		git clean -fdx
