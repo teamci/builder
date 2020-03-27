@@ -2,6 +2,7 @@ cfnlint/
 credo/
 editorconfig/
 eslint/
+gometalinter/
 kubeval/
 phpcs/
 rubocop/
