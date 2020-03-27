@@ -1,0 +1,12 @@
+cfnlint/
+credo/
+editorconfig/
+eslint/
+kubeval/
+phpcs/
+rubocop/
+script/
+shellcheck/
+stylelint/
+syntax/
+test/
