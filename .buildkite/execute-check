@@ -120,7 +120,7 @@ main() {
 
 	set +e
 	log::exec_command docker run --rm \
-		-v "${CODE_DIR}:/data/code:ro" \
+		-v "${CODE_DIR}:/data/code" \
 		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
