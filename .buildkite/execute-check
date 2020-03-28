@@ -32,6 +32,12 @@ log::info() {
 }
 
 main() {
+	####################################################################
+	#                                                                  #
+	#                             Setup                                #
+	#                                                                  #
+	####################################################################
+
 	local scratch
 	scratch="$(mktemp)"
 
@@ -43,12 +49,24 @@ main() {
 
 	touch logs/check.log
 
+	####################################################################
+	#                                                                  #
+	#                         Preflight Check                          #
+	#                                                                  #
+	####################################################################
+
 	log::header 'Preflight check'
 
 	if [ -z "${TEAMCI_CHECK_IMAGE:-}" ]; then
 		log::fatal "Internal error. TEAMCI_CHECK_IMAGE missing. Please contact support."
 		return 1
 	fi
+
+	####################################################################
+	#                                                                  #
+	#                         Set Constants                            #
+	#                                                                  #
+	####################################################################
 
 	log::header 'Preparing environment' | tee -a "${check_log}"
 	log::indicator 'Loading git metadata' | tee -a "${check_log}"
@@ -60,17 +78,23 @@ main() {
 	head_branch="$(buildkite-agent meta-data get teamci.head_branch)"
 
 	if [ -z "${repo}" ] || [ -z "${head_sha}" ] || [ -z "${head_branch}" ]; then
-		log::fatal "Missing repo/sha/branch metadata" | tee -a "${check_log}"
+		log::fatal "Internal error. Missing repo/sha/branch metadata. Please contact support." | tee -a "${check_log}"
 		return 1
 	fi
 
-	export CODE_DIR="${TEAMCI_CODE_DIR}/${repo}"
-	export TEAMCI_REPO_SLUG="${repo}"
-	export TEAMCI_COMMIT="${head_sha}"
+	local -r CODE_DIR="${TEAMCI_CODE_DIR}/${repo}"
+
+	local config_repo config_branch clone_status
+
+	config_repo="$(buildkite-agent meta-data get teamci.config.repo)"
+	config_branch="$(buildkite-agent meta-data get teamci.config.branch)"
+
+	local -r CONFIG_DIR="${TEAMCI_CODE_DIR}/${config_repo}"
 
 	log::indicator 'Fetching access token' | tee -a "${check_log}"
 
 	access_token_url="$(buildkite-agent meta-data get teamci.access_token_url)"
+
 	if log::exec_command curl --show-error -o "${scratch}" --fail -H 'Accept: application/json' "${access_token_url}" 2>&1 | tee -a "${check_log}"; then
 		log::info 'retrieved git access token'
 		export "ACCESS_TOKEN=$(jq -re '.token' "${scratch}")"
@@ -79,7 +103,50 @@ main() {
 		return 1
 	fi
 
-	log::header 'Cloning' | tee -a "${check_log}"
+	####################################################################
+	#                                                                  #
+	#                         Clone Config                             #
+	#                                                                  #
+	####################################################################
+
+	log::header "Cloning ${config_repo}" | tee -a "${check_log}"
+
+	if [ -d "${CONFIG_DIR}/.git" ]; then
+		pushd "${CONFIG_DIR}" > /dev/null
+
+		log::exec_command git remote set-url origin "https://x-access-token:${ACCESS_TOKEN}@github.com/${config_repo}.git"
+		log::exec_command git fetch -v --prune origin "${config_branch}"
+		log::exec_command git checkout -f "${config_branch}"
+		log::exec_command git pull origin "${config_branch}"
+
+		popd > /dev/null
+	else
+		mkdir -p "${CODE_DIR}"
+
+		set +e
+		log::exec_command git clone -v "https://x-access-token:${ACCESS_TOKEN}@github.com/${config_repo}.git" "${CONFIG_DIR}"
+		clone_status=$?
+		set -e
+
+		if [ $clone_status -ne 0 ]; then
+			log::warn "Could not clone ${config_repo}. Using default config."
+		else
+			pushd "${CONFIG_DIR}" > /dev/null
+
+			log::exec_command git fetch -v --prune origin "${config_branch}"
+			log::exec_command git checkout -f "${config_branch}"
+
+			popd > /dev/null
+		fi
+	fi
+
+	####################################################################
+	#                                                                  #
+	#                         Clone Code                               #
+	#                                                                  #
+	####################################################################
+
+	log::header "Cloning ${repo}" | tee -a "${check_log}"
 
 	if [ -d "${CODE_DIR}/.git" ]; then
 		pushd "${CODE_DIR}" > /dev/null
@@ -101,6 +168,12 @@ main() {
 		return 7
 	fi
 
+	####################################################################
+	#                                                                  #
+	#                       Prepare Check                              #
+	#                                                                  #
+	####################################################################
+
 	echo "=> Pulling image" | tee -a "${check_log}"
 	log::exec_command docker pull "${TEAMCI_CHECK_IMAGE}"  2>&1 | tee -a "${check_log}"
 
@@ -114,6 +187,12 @@ main() {
 		buildkite-agent meta-data set "teamci.output.${TEAMCI_CHECK_NAME}" 'plain'
 	fi
 
+	####################################################################
+	#                                                                  #
+	#                       Execute \o/ \o/                            #
+	#                                                                  #
+	####################################################################
+
 	log::header "Executing check" | tee -a "${check_log}"
 
 	local check_exit_code
@@ -121,6 +200,7 @@ main() {
 	set +e
 	log::exec_command docker run --rm \
 		-v "${CODE_DIR}:/data/code" \
+		-v "${CONFIG_DIR}:/data/config" \
 		-v "${PWD}/logs/tap.log:/data/logs/tap.log" \
 		--cpus 1 \
 		--memory 512m \
