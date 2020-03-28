@@ -49,6 +49,8 @@ main() {
 
 	touch logs/check.log
 
+	git config --global advice.detachedHead false
+
 	####################################################################
 	#                                                                  #
 	#                         Preflight Check                          #
