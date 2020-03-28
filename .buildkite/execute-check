@@ -86,8 +86,10 @@ main() {
 
 	local config_repo config_branch clone_status
 
-	config_repo="$(buildkite-agent meta-data get teamci.config.repo)"
-	config_branch="$(buildkite-agent meta-data get teamci.config.branch)"
+	# config_repo="$(buildkite-agent meta-data get teamci.config.repo)"
+	# config_branch="$(buildkite-agent meta-data get teamci.config.branch)"
+	config_repo="$(echo "${repo}" | cut -d '/' -f 1)/teamci"
+	config_branch=master
 
 	local -r CONFIG_DIR="${TEAMCI_CODE_DIR}/${config_repo}"
 
